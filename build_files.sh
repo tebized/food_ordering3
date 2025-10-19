@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Exit immediately if a command exits with a non-zero status.
 set -e
 
-python manage.py collectstatic --noinput --clear
+# Use python3.9 to be specific
+python3.9 manage.py collectstatic --noinput --clear
