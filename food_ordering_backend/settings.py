@@ -3,15 +3,19 @@ Django settings for food_ordering_backend project.
 """
 import os
 from pathlib import Path
+import dj_database_url  # Import for Postgres configuration
 
-# Django settings for food_ordering_backend project
-# ... the rest of your file
-from pathlib import Path
-
+# --- Core Settings ---
 BASE_DIR = Path(__file__).resolve().parent.parent
-SECRET_KEY = 'django-insecure-dummy-key-for-now'
-DEBUG = False
-ALLOWED_HOSTS = ['e-service.press', 'www.e-service.press', '127.0.0.1', 'localhost','127.0.0.1', '.vercel.app']
+
+# SECURITY WARNING: Your SECRET_KEY and DEBUG settings are now loaded from Environment Variables
+# You must set these in your Vercel project settings!
+SECRET_KEY = os.environ.get('SECRET_KEY')
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+
+# Cleaned up ALLOWED_HOSTS
+ALLOWED_HOSTS = ['.vercel.app', '127.0.0.1', 'e-service.press', 'www.e-service.press']
+
 
 # --- Application Definition ---
 INSTALLED_APPS = [
@@ -32,13 +36,12 @@ INSTALLED_APPS = [
     'api',
 ]
 
+# --- Middleware ---
+# Cleaned up duplicate entries
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware', # For serving static files
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    # CORS Middleware should be placed as high as possible
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -68,11 +71,13 @@ TEMPLATES = [
 WSGI_APPLICATION = 'food_ordering_backend.wsgi.application'
 
 # --- Database ---
+# This is now configured to use your Vercel Postgres database via the DATABASE_URL environment variable
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        conn_max_age=600,
+        conn_health_checks=True,
+        default=os.environ.get('DATABASE_URL')
+    )
 }
 
 # --- Password Validation ---
@@ -90,9 +95,16 @@ USE_I18N = True
 USE_TZ = True
 
 # --- Static and Media Files ---
-STATIC_URL = 'static/'
+# Cleaned up and simplified for Vercel deployment
+STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# This tells Django where to find your static files.
+# Whitenoise will serve them directly from this directory in production.
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -100,40 +112,22 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'api.User'
 
 # --- Django Rest Framework Settings ---
-# This is the crucial part for fixing the login issue.
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        # This tells DRF to use JWT for authentication, which is what our frontend sends.
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ],
 }
 
 # --- CORS Settings ---
-# This allows your frontend (e.g., from http://127.0.0.1:5501) to communicate with the backend.
 CORS_ALLOW_ALL_ORIGINS = True
 
 # --- JWT Token Settings ---
-# Configure JWT token expiration times
 from datetime import timedelta
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=90),  # 3 months access token
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=90),  # 3 months refresh token
-    'ROTATE_REFRESH_TOKENS': True,  # Generate new refresh token on each refresh
-    'BLACKLIST_AFTER_ROTATION': True,  # Blacklist old refresh tokens
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=90),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=90),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
 }
-
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-# Add these lines at the very end of the file
-
-STATIC_URL = '/static/'
-
-# This is the directory where Django will collect all static files
-#STATIC_ROOT = BASE_DIR / 'staticfiles_build'
-
-# This tells Django where to find your static files in the first place
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
