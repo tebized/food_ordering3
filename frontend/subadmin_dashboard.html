@@ -1,0 +1,1642 @@
+w<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sub-admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons (Hamburger Menu, etc.) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .tab-active {
+            border-bottom-color: #4f46e5;
+            color: #4f46e5;
+        }
+
+        .modal {
+            display: none;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .payment-proof-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .payment-proof-modal.active {
+            display: flex;
+        }
+
+        .payment-proof-content {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            max-width: 90%;
+            max-height: 90%;
+            position: relative;
+        }
+
+        .payment-proof-image {
+            max-width: 100%;
+            max-height: 70vh;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: opacity 0.3s ease;
+        }
+
+        .payment-proof-image.loading {
+            opacity: 0.5;
+        }
+
+        .image-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .close-payment-proof {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .close-payment-proof:hover {
+            color: #000;
+        }
+
+        .status-badge {
+            font-weight: 500;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 12px;
+            text-transform: capitalize;
+        }
+
+        .status-preparing {
+            background-color: #FEF3C7;
+            color: #92400E;
+        }
+
+        .status-ready {
+            background-color: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .status-completed {
+            background-color: #D1FAE5;
+            color: #065F46;
+        }
+
+        .chat-message {
+            max-width: 75%;
+            padding: 8px 12px;
+            border-radius: 1rem;
+        }
+
+        .chat-sent {
+            background-color: #4f46e5;
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 0.25rem;
+        }
+
+        .chat-received {
+            background-color: #e5e7eb;
+            color: #1f2937;
+            align-self: flex-start;
+            border-bottom-left-radius: 0.25rem;
+        }
+
+        /* Mobile-first responsive styles */
+        .mobile-menu {
+            display: none;
+        }
+
+        .mobile-menu.active {
+            display: block;
+        }
+
+        /* Responsive grid for orders */
+        @media (min-width: 1024px) {
+            #orders-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 2rem;
+            }
+        }
+
+        /* Mobile-specific styles */
+        @media (max-width: 768px) {
+            .mobile-nav {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                width: 100%;
+            }
+            
+            .desktop-nav {
+                display: none;
+            }
+            
+            .mobile-menu {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: white;
+                border-top: 1px solid #e5e7eb;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+                z-index: 50;
+            }
+            
+            .mobile-menu a {
+                display: block;
+                padding: 1rem;
+                border-bottom: 1px solid #f3f4f6;
+                color: #374151;
+                text-decoration: none;
+            }
+            
+            .mobile-menu a:hover {
+                background-color: #f9fafb;
+            }
+            
+            /* Mobile-friendly tabs */
+            .mobile-tabs {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+            }
+            
+            .mobile-tabs::-webkit-scrollbar {
+                display: none;
+            }
+            
+            .mobile-tabs nav {
+                min-width: max-content;
+                padding-bottom: 0.5rem;
+            }
+            
+            .mobile-tabs button {
+                min-width: 120px;
+                padding: 0.75rem 1rem;
+                font-size: 0.875rem;
+            }
+            
+            /* Mobile card improvements */
+            .mobile-card {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 1rem;
+            }
+            
+            .mobile-card .card-content {
+                width: 100%;
+            }
+            
+            .mobile-card .card-actions {
+                width: 100%;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                justify-content: flex-start;
+            }
+            
+            .mobile-card .card-actions button {
+                flex: 1;
+                min-width: 80px;
+                padding: 0.5rem 0.75rem;
+                font-size: 0.75rem;
+            }
+            
+            /* Mobile modal improvements */
+            .mobile-modal {
+                margin: 1rem;
+                max-height: calc(100vh - 2rem);
+                overflow-y: auto;
+            }
+            
+            /* Mobile button improvements */
+            .mobile-btn {
+                min-height: 44px;
+                padding: 0.75rem 1rem;
+                font-size: 0.875rem;
+            }
+            
+            /* Mobile spacing */
+            .mobile-spacing {
+                padding: 1rem;
+            }
+            
+            .mobile-spacing-sm {
+                padding: 0.75rem;
+            }
+        }
+
+        /* Tablet styles */
+        @media (min-width: 769px) and (max-width: 1023px) {
+            .tablet-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.5rem;
+            }
+        }
+
+        /* Desktop styles */
+        @media (min-width: 1024px) {
+            .desktop-nav {
+                display: flex;
+            }
+            
+            .mobile-nav {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100">
+
+    <!-- Navbar -->
+    <nav class="bg-white shadow-md relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Desktop Navigation -->
+            <div class="desktop-nav items-center justify-between h-16 hidden lg:flex">
+                <div class="flex-shrink-0">
+                    <h1 class="text-xl font-bold text-gray-800">Sub-admin Dashboard</h1>
+                </div>
+                <div>
+                    <button id="logout-button"
+                        class="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-lg text-sm transition duration-150 shadow-md">
+                        Log Out
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Mobile Navigation -->
+            <div class="mobile-nav lg:hidden h-16">
+                <div class="flex-shrink-0">
+                    <h1 class="text-lg font-bold text-gray-800">Sub-admin</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button id="mobile-menu-toggle" class="text-gray-600 hover:text-gray-900 focus:outline-none">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    <button id="logout-button-mobile"
+                        class="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-3 rounded-lg text-sm transition duration-150 shadow-md">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="mobile-menu">
+                <a href="#" class="block px-4 py-3 text-gray-700 hover:bg-gray-100">
+                    <i class="fas fa-clipboard-list mr-2"></i>Order Management
+                </a>
+                <a href="#" class="block px-4 py-3 text-gray-700 hover:bg-gray-100">
+                    <i class="fas fa-store mr-2"></i>Restaurant Management
+                </a>
+                <a href="#" class="block px-4 py-3 text-gray-700 hover:bg-gray-100">
+                    <i class="fas fa-comments mr-2"></i>Support Chats
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+
+        <!-- Tab Navigation -->
+        <div class="border-b border-gray-200 overflow-x-auto mobile-tabs">
+            <nav class="-mb-px flex space-x-4 sm:space-x-8" aria-label="Tabs">
+                <button id="tab-orders"
+                    class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm tab-active transition duration-150">Order
+                    Management</button>
+                <button id="tab-restaurants"
+                    class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 transition duration-150">Restaurant
+                    Management</button>
+                <button id="tab-chats"
+                    class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 transition duration-150">Support
+                    Chats</button>
+            </nav>
+        </div>
+
+        <div class="mt-6">
+            <!-- Orders Panel -->
+            <div id="panel-orders" class="space-y-6 lg:space-y-8">
+                <div class="bg-white rounded-xl shadow-lg p-4 lg:p-6">
+                    <h2 class="text-xl lg:text-2xl font-bold text-gray-800 mb-4 lg:mb-6">Waiting Approval</h2>
+                    <div id="pending-orders-container" class="space-y-3 lg:space-y-4">
+                        <p id="loading-pending-orders-message">Loading orders...</p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-4 lg:p-6">
+                    <h2 class="text-xl lg:text-2xl font-bold text-gray-800 mb-4 lg:mb-6">Preparing Orders</h2>
+                    <div id="approved-orders-container" class="space-y-3 lg:space-y-4">
+                        <p id="loading-approved-orders-message">Loading orders...</p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-4 lg:p-6">
+                    <h2 class="text-xl lg:text-2xl font-bold text-gray-800 mb-4 lg:mb-6">Delivered Orders</h2>
+                    <div id="delivered-orders-container" class="space-y-3 lg:space-y-4">
+                        <p id="loading-delivered-orders-message">Loading orders...</p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-4 lg:p-6">
+                    <h2 class="text-xl lg:text-2xl font-bold text-gray-800 mb-4 lg:mb-6">Completed Orders</h2>
+                    <div id="completed-orders-container" class="space-y-3 lg:space-y-4">
+                        <p id="loading-completed-orders-message">Loading orders...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Restaurants Panel -->
+            <div id="panel-restaurants" class="hidden">
+                <div class="bg-white rounded-xl shadow-lg p-4 lg:p-6">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 lg:mb-6 gap-4">
+                        <h2 class="text-xl lg:text-2xl font-bold text-gray-800">Manage Restaurants</h2>
+                        <button id="add-restaurant-btn"
+                            class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg text-sm mobile-btn w-full sm:w-auto">Add
+                            New Restaurant</button>
+                    </div>
+                    <form id="add-restaurant-form" class="hidden mb-6 p-4 border rounded-lg bg-gray-50 space-y-3">
+                        <h3 class="text-lg font-semibold">New Restaurant Details</h3>
+                        <div>
+                            <label for="restaurant-name" class="block text-sm font-medium text-gray-700">Name</label>
+                            <input type="text" id="restaurant-name" required
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">
+                        </div>
+                        <div>
+                            <label for="restaurant-address"
+                                class="block text-sm font-medium text-gray-700">Address</label>
+                            <input type="text" id="restaurant-address" required
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">
+                        </div>
+                        <div>
+                            <label for="restaurant-phone" class="block text-sm font-medium text-gray-700">Phone</label>
+                            <input type="text" id="restaurant-phone" required
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">
+                        </div>
+                        <div>
+                            <label for="restaurant-logo" class="block text-sm font-medium text-gray-700">Logo</label>
+                            <input type="file" id="restaurant-logo" accept="image/*"
+                                class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0">
+                        </div>
+                        <div class="flex justify-end space-x-2">
+                            <button type="button" id="cancel-add-restaurant-btn"
+                                class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-lg text-sm">Cancel</button>
+                            <button type="submit"
+                                class="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-lg text-sm">Save
+                                Restaurant</button>
+                        </div>
+                    </form>
+                    <div id="restaurants-container" class="space-y-4">
+                        <p id="loading-restaurants-message">Loading restaurants...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chats Panel -->
+            <div id="panel-chats" class="hidden">
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Open Support Conversations</h2>
+                    <div id="conversations-container" class="space-y-4">
+                        <p id="loading-conversations-message">Loading conversations...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ALL MODALS -->
+    <!-- Edit Restaurant Modal -->
+    <div id="edit-restaurant-modal" class="modal fixed z-10 inset-0 overflow-y-auto">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+            <div
+                class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full mobile-modal">
+                <form id="edit-restaurant-form">
+                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                        <h3 class="text-lg sm:text-xl leading-6 font-bold text-gray-900 mb-4">Edit Restaurant</h3>
+                        <input type="hidden" id="edit-restaurant-id">
+                        <div class="space-y-4">
+                            <div>
+                                <label for="edit-restaurant-name"
+                                    class="block text-sm font-medium text-gray-700">Name</label>
+                                <input type="text" id="edit-restaurant-name" required
+                                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm mobile-btn">
+                            </div>
+                            <div>
+                                <label for="edit-restaurant-address"
+                                    class="block text-sm font-medium text-gray-700">Address</label>
+                                <input type="text" id="edit-restaurant-address" required
+                                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm mobile-btn">
+                            </div>
+                            <div>
+                                <label for="edit-restaurant-phone"
+                                    class="block text-sm font-medium text-gray-700">Phone</label>
+                                <input type="text" id="edit-restaurant-phone" required
+                                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm mobile-btn">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Current Logo</label>
+                                <img id="edit-current-logo" src="" alt="Current Logo"
+                                    class="mt-1 h-16 w-16 sm:h-20 sm:w-20 rounded-full object-cover">
+                            </div>
+                            <div>
+                                <label for="edit-restaurant-logo" class="block text-sm font-medium text-gray-700">Upload
+                                    New Logo</label>
+                                <input type="file" id="edit-restaurant-logo" accept="image/*"
+                                    class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 mobile-btn">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                        <button type="submit"
+                            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 sm:ml-3 sm:w-auto sm:text-sm mobile-btn">Save
+                            Changes</button>
+                        <button type="button" id="cancel-edit-restaurant-btn"
+                            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:mt-0 sm:w-auto sm:text-sm mobile-btn">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu Management Modal -->
+    <div id="menu-modal" class="modal fixed z-20 inset-0 overflow-y-auto">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+            <div
+                class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full mobile-modal">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <h3 class="text-xl leading-6 font-bold text-gray-900" id="menu-modal-title">Manage Menu for...</h3>
+                    <div class="mt-4">
+                        <form id="add-menu-item-form" class="mb-6 p-4 border rounded-lg bg-gray-50 space-y-3">
+                            <h4 class="text-md font-semibold">Add New Menu Item</h4>
+                            <input type="hidden" id="menu-item-restaurant-id">
+                            <div>
+                                <label for="menu-item-name" class="block text-sm font-medium text-gray-700">Name</label>
+                                <input type="text" id="menu-item-name" required
+                                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">
+                            </div>
+                            <div>
+                                <label for="menu-item-description"
+                                    class="block text-sm font-medium text-gray-700">Description</label>
+                                <textarea id="menu-item-description" rows="2" required
+                                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"></textarea>
+                            </div>
+                            <div>
+                                <label for="menu-item-price" class="block text-sm font-medium text-gray-700">Price
+                                    (Birr)</label>
+                                <input type="number" step="0.01" id="menu-item-price" required
+                                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">
+                            </div>
+                            <div>
+                                <label for="menu-item-image"
+                                    class="block text-sm font-medium text-gray-700">Image</label>
+                                <input type="file" id="menu-item-image" accept="image/*" required
+                                    class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0">
+                            </div>
+                            <div class="flex justify-end">
+                                <button type="submit"
+                                    class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg text-sm">Add
+                                    Item</button>
+                            </div>
+                        </form>
+                        <h4 class="text-md font-semibold mb-2">Current Menu</h4>
+                        <div id="menu-items-container" class="space-y-2 max-h-60 overflow-y-auto"></div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" id="close-menu-modal-btn"
+                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:mt-0 sm:w-auto sm:text-sm">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Addon Management Modal -->
+    <div id="addon-modal" class="modal fixed z-30 inset-0 overflow-y-auto">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+            <div
+                class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full mobile-modal">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <h3 class="text-xl leading-6 font-bold text-gray-900" id="addon-modal-title">Manage Add-ons for...
+                    </h3>
+                    <div class="mt-4">
+                        <form id="add-addon-form" class="mb-6 p-4 border rounded-lg bg-gray-50 space-y-3">
+                            <h4 class="text-md font-semibold">Add New Add-on</h4>
+                            <input type="hidden" id="addon-restaurant-id">
+                            <div>
+                                <label for="addon-name" class="block text-sm font-medium text-gray-700">Name</label>
+                                <input type="text" id="addon-name" required
+                                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">
+                            </div>
+                            <div>
+                                <label for="addon-price" class="block text-sm font-medium text-gray-700">Price
+                                    (Birr)</label>
+                                <input type="number" step="0.01" id="addon-price" required
+                                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">
+                            </div>
+                            <div>
+                                <label for="addon-image" class="block text-sm font-medium text-gray-700">Image
+                                    (Optional)</label>
+                                <input type="file" id="addon-image" accept="image/*"
+                                    class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0">
+                            </div>
+                            <div class="flex justify-end">
+                                <button type="submit"
+                                    class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg text-sm">Add
+                                    Add-on</button>
+                            </div>
+                        </form>
+                        <h4 class="text-md font-semibold mb-2">Current Add-ons</h4>
+                        <div id="addons-container" class="space-y-2 max-h-60 overflow-y-auto"></div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" id="close-addon-modal-btn"
+                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Account Management Modal -->
+    <div id="payment-modal" class="modal fixed z-40 inset-0 overflow-y-auto">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+            <div
+                class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full mobile-modal">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <h3 class="text-xl leading-6 font-bold text-gray-900" id="payment-modal-title">Manage Payments
+                        for...</h3>
+                    <div class="mt-4">
+                        <form id="add-payment-account-form" class="mb-6 p-4 border rounded-lg bg-gray-50 space-y-3">
+                            <h4 class="text-md font-semibold">Add New Payment Account</h4>
+                            <input type="hidden" id="payment-restaurant-id">
+                            <div>
+                                <label for="payment-account-type"
+                                    class="block text-sm font-medium text-gray-700">Account Type</label>
+                                <select id="payment-account-type" required
+                                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">
+                                    <option value="CBE">CBE</option>
+                                    <option value="Telebirr">Telebirr</option>
+                                    <option value="Awash">Awash</option>
+                                    <option value="Dashin">Dashin</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="payment-account-number"
+                                    class="block text-sm font-medium text-gray-700">Account Number / Details</label>
+                                <input type="text" id="payment-account-number" required
+                                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">
+                            </div>
+                            <div class="flex justify-end">
+                                <button type="submit"
+                                    class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg text-sm">Add
+                                    Account</button>
+                            </div>
+                        </form>
+                        <h4 class="text-md font-semibold mb-2">Current Accounts</h4>
+                        <div id="payment-accounts-container" class="space-y-2 max-h-60 overflow-y-auto"></div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" id="close-payment-modal-btn"
+                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Modal -->
+    <div id="chat-modal" class="modal fixed z-50 inset-0 overflow-y-auto">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full mobile-modal">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <h3 class="text-xl leading-6 font-bold text-gray-900 mb-4" id="chat-modal-title">Chat with Customer</h3>
+                    <div class="chat-container" style="height: 400px; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+                        <div id="chat-messages" class="space-y-3">
+                            <!-- Messages will be loaded here -->
+                        </div>
+                    </div>
+                    <div class="flex space-x-2">
+                        <input type="text" id="chat-message-input" placeholder="Type your message..." 
+                               class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        <button id="send-message-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md">
+                            Send
+                        </button>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" id="close-chat-modal-btn"
+                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:mt-0 sm:w-auto sm:text-sm">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Proof Modal -->
+    <div id="payment-proof-modal" class="payment-proof-modal">
+        <div class="payment-proof-content">
+            <button class="close-payment-proof" onclick="closePaymentProofModal()">&times;</button>
+            <h3 class="text-xl font-bold mb-4 text-center">Payment Proof</h3>
+            <div id="image-container">
+                <div id="image-loading" class="image-loading">
+                    <i class="fas fa-spinner fa-spin mr-2"></i>Loading image...
+                </div>
+                <img id="payment-proof-image" class="payment-proof-image" src="" alt="Payment Proof" style="display: none;">
+            </div>
+            <div class="mt-4 text-center">
+                <button onclick="closePaymentProofModal()" class="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-md mr-2">
+                    Close
+                </button>
+                <button onclick="testImageLoad()" class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md">
+                    Test Image Load
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- COMPLETE SCRIPT WITH ALL FUNCTIONS ---
+        const API_BASE_URL = 'http://127.0.0.1:8000';
+        let userProfile = null;
+        let currentUserId = null;
+
+        // --- AUTH & API ---
+        async function fetchWithAuth(endpoint, options = {}) {
+            const token = localStorage.getItem('accessToken');
+            if (!token) {
+                window.location.href = 'subadmin_login.html';
+                return Promise.reject(new Error('No token found'));
+            }
+            const headers = { 'Authorization': `Bearer ${token}`, ...options.headers };
+            if (!(options.body instanceof FormData)) {
+                headers['Content-Type'] = 'application/json';
+            }
+            try {
+                const response = await fetch(`${API_BASE_URL}${endpoint}`, { ...options, headers });
+                if (response.status === 401) {
+                    localStorage.removeItem('accessToken');
+                    window.location.href = 'subadmin_login.html';
+                    throw new Error('Unauthorized');
+                }
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(JSON.stringify(errorData));
+                }
+                if (response.status === 204) return null;
+                const text = await response.text();
+                return text ? JSON.parse(text) : null;
+            } catch (error) {
+                console.error(`API Error on ${options.method || 'GET'} ${endpoint}:`, error);
+                if (error.message !== 'Unauthorized') {
+                    throw error;
+                }
+            }
+        }
+
+        async function fetchUserProfile() {
+            try {
+                userProfile = await fetchWithAuth('/api/profile/');
+                currentUserId = userProfile.id;
+                
+                // Role-based access control: Only sub-admin can access this dashboard
+                if (userProfile.role !== 'sub_admin') {
+                    localStorage.removeItem('accessToken');
+                    alert('Access Denied: You do not have permission to access this page.');
+                    window.location.href = 'subadmin_login.html';
+                    return;
+                }
+            } catch (error) {
+                console.error("Failed to fetch user profile", error);
+            }
+        }
+
+        // --- ORDER MANAGEMENT ---
+        function refreshAllOrders() {
+            fetchOrdersByStatus('Pending Approval', 'pending-orders-container', createPendingOrderCard);
+            fetchOrdersByStatus('Preparing', 'approved-orders-container', createApprovedOrderCard);
+            fetchOrdersByStatus('Delivered', 'delivered-orders-container', createDeliveredOrderCard);
+            fetchOrdersByStatus('Completed', 'completed-orders-container', createCompletedOrderCard);
+        }
+
+        async function fetchOrdersByStatus(status, containerId, cardCreator) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = `<p>Loading orders...</p>`;
+            try {
+                let orders = [];
+                if (Array.isArray(status)) {
+                    const results = await Promise.all(status.map(s => fetchWithAuth(`/api/orders/?status=${s}`)));
+                    orders = results.flat();
+                } else {
+                    orders = await fetchWithAuth(`/api/orders/?status=${status}`);
+                }
+                displayOrders(orders, containerId, cardCreator);
+            } catch (error) {
+                container.innerHTML = `<p class="text-red-500">Could not load orders.</p>`;
+            }
+        }
+
+        function displayOrders(orders, containerId, cardCreator) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            console.log(`=== DISPLAY ORDERS DEBUG ===`);
+            console.log(`Container ID: ${containerId}`);
+            console.log(`Orders received:`, orders);
+            console.log(`Orders length:`, orders ? orders.length : 'null');
+            console.log(`Card creator function:`, cardCreator.name);
+            console.log(`========================`);
+            
+            if (!orders || orders.length === 0) {
+                container.innerHTML = `<p class="text-gray-500">No orders in this category.</p>`;
+                return;
+            }
+            
+            orders.forEach((order, index) => {
+                console.log(`Processing order ${index}:`, order);
+                try {
+                    const orderCard = document.createElement('div');
+                    orderCard.className = 'border rounded-lg p-4 flex justify-between items-center';
+                    orderCard.innerHTML = cardCreator(order);
+                    container.appendChild(orderCard);
+                    console.log(`Successfully created card for order ${order.order_code}`);
+                } catch (error) {
+                    console.error(`Error creating card for order ${order.order_code}:`, error);
+                    const errorCard = document.createElement('div');
+                    errorCard.className = 'border rounded-lg p-4 bg-red-50';
+                    errorCard.innerHTML = `<p class="text-red-500">Error displaying order ${order.order_code}: ${error.message}</p>`;
+                    container.appendChild(errorCard);
+                }
+            });
+        }
+
+        function createPendingOrderCard(order) {
+            // Debug: log the order payment proof data
+            console.log('=== ORDER PAYMENT PROOF DEBUG ===');
+            console.log('Order ID:', order.id);
+            console.log('Order Code:', order.order_code);
+            console.log('Raw payment_proof:', order.payment_proof);
+            console.log('Payment proof type:', typeof order.payment_proof);
+            console.log('Payment proof starts with /:', order.payment_proof ? order.payment_proof.startsWith('/') : 'N/A');
+            console.log('================================');
+            
+            const orderItems = order.order_items ? order.order_items.map(item => {
+                // Debug: log the item to see what's available
+                console.log('Order item:', item);
+                
+                // Try different ways to get the item name
+                const itemName = item.menu_item_name || 
+                                (item.menu_item_details ? item.menu_item_details.name : null) ||
+                                (item.menu_item ? item.menu_item.name : null) ||
+                                (item.addon_name || (item.addon_details ? item.addon_details.name : null)) ||
+                                'Unknown Item';
+                
+                const itemPrice = item.menu_item_price || 
+                                 (item.menu_item_details ? item.menu_item_details.price : null) ||
+                                 (item.menu_item ? item.menu_item.price : null) ||
+                                 (item.addon_price || (item.addon_details ? item.addon_details.price : null)) ||
+                                 0;
+                
+                return `${itemName} (${item.quantity}x) - ${itemPrice * item.quantity} Birr`;
+            }).join('<br>') : 'No items';
+            
+            return `
+                <div class="card-content w-full">
+                    <div class="flex justify-between items-start mb-2">
+                        <p class="font-semibold text-sm lg:text-base">Order #${order.order_code}</p>
+                        <span class="text-xs text-gray-500">${new Date(order.created_at).toLocaleDateString()}</span>
+                    </div>
+                    <div class="text-xs lg:text-sm text-gray-600 space-y-1">
+                        <p><strong>Customer:</strong> ${order.customer_details ? order.customer_details.username : 'Unknown'}</p>
+                        <p><strong>Phone:</strong> ${order.customer_details ? (order.customer_details.phone_number || 'N/A') : 'N/A'}</p>
+                        <p><strong>Restaurant:</strong> ${order.restaurant_details ? order.restaurant_details.name : 'Unknown'}</p>
+                        <p><strong>Delivery Address:</strong> N/A</p>
+                        <div class="mt-2">
+                            <p><strong>Items:</strong></p>
+                            <div class="ml-2 text-xs">${orderItems}</div>
+                        </div>
+                        <p class="mt-2"><strong>Total:</strong> ${order.total_price} Birr</p>
+                    </div>
+                </div>
+                <div class="card-actions flex flex-col gap-2">
+                    ${order.payment_proof ? `<button onclick="showPaymentProof('${order.payment_proof.startsWith('http') ? order.payment_proof : API_BASE_URL + order.payment_proof}')" class="text-blue-600 hover:underline text-xs lg:text-sm mobile-btn bg-blue-50 hover:bg-blue-100 rounded-lg px-3 py-2 text-center w-full">
+                        <i class="fas fa-image mr-1"></i>View Payment Proof
+                    </button>` : '<p class="text-red-500 text-xs">No payment proof uploaded</p>'}
+                    <button data-id="${order.id}" class="approve-order-btn bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-3 lg:px-4 rounded-lg text-xs lg:text-sm mobile-btn">
+                        <i class="fas fa-check mr-1"></i>Approve Order
+                    </button>
+                    <button data-id="${order.id}" class="decline-order-btn bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-3 lg:px-4 rounded-lg text-xs lg:text-sm mobile-btn">
+                        <i class="fas fa-times mr-1"></i>Decline Order
+                    </button>
+                </div>`;
+        }
+        function createApprovedOrderCard(order) {
+            const statusClass = order.status === 'Preparing' ? 'status-preparing' : 'status-ready';
+            const orderItems = order.order_items ? order.order_items.map(item => 
+                `${item.menu_item.name} (${item.quantity}x) - ${item.menu_item.price * item.quantity} Birr`
+            ).join('<br>') : 'No items';
+            
+            return `
+               <div class="card-content w-full">
+                    <div class="flex justify-between items-start mb-2">
+                        <p class="font-semibold text-sm lg:text-base">Order #${order.order_code}</p>
+                        <span class="text-xs text-gray-500">${new Date(order.created_at).toLocaleDateString()}</span>
+                    </div>
+                    <div class="text-xs lg:text-sm text-gray-600 space-y-1">
+                        <p><strong>Customer:</strong> ${order.customer_details ? order.customer_details.username : 'Unknown'}</p>
+                        <p><strong>Phone:</strong> ${order.customer_details ? (order.customer_details.phone_number || 'N/A') : 'N/A'}</p>
+                        <p><strong>Restaurant:</strong> ${order.restaurant_details ? order.restaurant_details.name : 'Unknown'}</p>
+                        <p><strong>Delivery Address:</strong> N/A</p>
+                        <div class="mt-2">
+                            <p><strong>Items:</strong></p>
+                            <div class="ml-2 text-xs">${orderItems}</div>
+                        </div>
+                        <p class="mt-2"><strong>Total:</strong> ${order.total_price} Birr</p>
+                    </div>
+                </div>
+                <div class="card-actions flex flex-col gap-2">
+                    <span class="status-badge ${statusClass} text-xs lg:text-sm text-center">${order.status.replace(' for Pickup', '')}</span>
+                    <button data-id="${order.id}" class="mark-delivered-btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-3 lg:px-4 rounded-lg text-xs lg:text-sm mobile-btn">Delivered</button>
+                </div>`;
+        }
+
+
+        function createDeliveredOrderCard(order) {
+            const orderItems = order.order_items ? order.order_items.map(item => {
+                // Try different ways to get the item name
+                const itemName = item.menu_item_name || 
+                                (item.menu_item_details ? item.menu_item_details.name : null) ||
+                                (item.menu_item ? item.menu_item.name : null) ||
+                                (item.addon_name || (item.addon_details ? item.addon_details.name : null)) ||
+                                'Unknown Item';
+                
+                const itemPrice = item.menu_item_price || 
+                                 (item.menu_item_details ? item.menu_item_details.price : null) ||
+                                 (item.menu_item ? item.menu_item.price : null) ||
+                                 (item.addon_price || (item.addon_details ? item.addon_details.price : null)) ||
+                                 0;
+                
+                return `${itemName} (${item.quantity}x) - ${itemPrice * item.quantity} Birr`;
+            }).join('<br>') : 'No items';
+            
+            return `
+                <div class="card-content w-full">
+                    <div class="flex justify-between items-start mb-2">
+                        <p class="font-semibold text-sm lg:text-base">Order #${order.order_code}</p>
+                        <span class="text-xs text-gray-500">${new Date(order.created_at).toLocaleDateString()}</span>
+                    </div>
+                    <div class="text-xs lg:text-sm text-gray-600 space-y-1">
+                        <p><strong>Customer:</strong> ${order.customer_details ? order.customer_details.username : 'Unknown'}</p>
+                        <p><strong>Phone:</strong> ${order.customer_details ? (order.customer_details.phone_number || 'N/A') : 'N/A'}</p>
+                        <p><strong>Restaurant:</strong> ${order.restaurant_details ? order.restaurant_details.name : 'Unknown'}</p>
+                        <p><strong>Delivery Address:</strong> N/A</p>
+                        <div class="mt-2">
+                            <p><strong>Items:</strong></p>
+                            <div class="ml-2 text-xs">${orderItems}</div>
+                        </div>
+                        <p class="mt-2"><strong>Total:</strong> ${order.total_price} Birr</p>
+                    </div>
+                </div>
+                <div class="card-actions flex flex-col gap-2">
+                    <span class="status-badge status-delivered text-xs lg:text-sm text-center">Delivered</span>
+                    <button data-id="${order.id}" class="mark-completed-btn bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-2 lg:px-3 rounded-lg text-xs mobile-btn">Mark as Completed</button>
+                </div>`;
+        }
+
+        function createCompletedOrderCard(order) {
+            const orderItems = order.order_items ? order.order_items.map(item => {
+                // Try different ways to get the item name
+                const itemName = item.menu_item_name || 
+                                (item.menu_item_details ? item.menu_item_details.name : null) ||
+                                (item.menu_item ? item.menu_item.name : null) ||
+                                (item.addon_name || (item.addon_details ? item.addon_details.name : null)) ||
+                                'Unknown Item';
+                
+                const itemPrice = item.menu_item_price || 
+                                 (item.menu_item_details ? item.menu_item_details.price : null) ||
+                                 (item.menu_item ? item.menu_item.price : null) ||
+                                 (item.addon_price || (item.addon_details ? item.addon_details.price : null)) ||
+                                 0;
+                
+                return `${itemName} (${item.quantity}x) - ${itemPrice * item.quantity} Birr`;
+            }).join('<br>') : 'No items';
+            
+            return `
+                <div class="card-content w-full">
+                    <div class="flex justify-between items-start mb-2">
+                        <p class="font-semibold text-sm lg:text-base">Order #${order.order_code}</p>
+                        <span class="text-xs text-gray-500">${new Date(order.created_at).toLocaleDateString()}</span>
+                    </div>
+                    <div class="text-xs lg:text-sm text-gray-600 space-y-1">
+                        <p><strong>Customer:</strong> ${order.customer_details ? order.customer_details.username : 'Unknown'}</p>
+                        <p><strong>Phone:</strong> ${order.customer_details ? (order.customer_details.phone_number || 'N/A') : 'N/A'}</p>
+                        <p><strong>Restaurant:</strong> ${order.restaurant_details ? order.restaurant_details.name : 'Unknown'}</p>
+                        <p><strong>Delivery Address:</strong> N/A</p>
+                        <div class="mt-2">
+                            <p><strong>Items:</strong></p>
+                            <div class="ml-2 text-xs">${orderItems}</div>
+                        </div>
+                        <p class="mt-2"><strong>Total:</strong> ${order.total_price} Birr</p>
+                    </div>
+                </div>
+                <div class="card-actions flex flex-col gap-2">
+                    <span class="status-badge status-completed text-xs lg:text-sm text-center">Completed</span>
+                    <button data-id="${order.id}" class="remove-order-btn bg-gray-500 hover:bg-gray-600 text-white font-bold py-1 px-2 lg:px-3 rounded-lg text-xs mobile-btn">Remove</button>
+                </div>`;
+        }
+
+
+        // --- RESTAURANT MANAGEMENT ---
+        async function fetchRestaurants() {
+            const container = document.getElementById('restaurants-container');
+            container.innerHTML = `<p>Loading restaurants...</p>`;
+            try {
+                const restaurants = await fetchWithAuth('/api/restaurants/');
+                displayRestaurants(restaurants);
+            } catch (error) {
+                container.innerHTML = `<p class="text-red-500">Could not load restaurants.</p>`;
+            }
+        }
+
+        function displayRestaurants(restaurants) {
+            const container = document.getElementById('restaurants-container');
+            container.innerHTML = '';
+            if (!restaurants || restaurants.length === 0) {
+                container.innerHTML = `<p class="text-gray-500">No restaurants found. You can add one!</p>`;
+                return;
+            }
+            restaurants.forEach(resto => {
+                const restoCard = document.createElement('div');
+                restoCard.className = 'border rounded-lg p-4 mobile-card flex justify-between items-center';
+                restoCard.innerHTML = `
+                    <div class="card-content flex items-center gap-3 lg:gap-4">
+                        <img src="${resto.logo || 'https://placehold.co/64/E2E8F0/A0AEC0?text=Logo'}" class="w-12 h-12 lg:w-16 lg:h-16 rounded-full object-cover">
+                        <div>
+                            <p class="font-semibold text-sm lg:text-base">${resto.name}</p>
+                            <p class="text-xs lg:text-sm text-gray-600">${resto.address}</p>
+                        </div>
+                    </div>
+                    <div class="card-actions flex items-center gap-2 lg:gap-4 flex-wrap justify-end">
+                        <button data-id="${resto.id}" data-name="${resto.name}" class="manage-payments-btn text-blue-600 hover:underline text-xs lg:text-sm mobile-btn bg-blue-50 hover:bg-blue-100 rounded px-2 py-1">Payments</button>
+                        <button data-id="${resto.id}" data-name="${resto.name}" class="manage-addons-btn text-purple-600 hover:underline text-xs lg:text-sm mobile-btn bg-purple-50 hover:bg-purple-100 rounded px-2 py-1">Add-ons</button>
+                        <button data-id="${resto.id}" data-name="${resto.name}" class="manage-menu-btn text-indigo-600 hover:underline text-xs lg:text-sm mobile-btn bg-indigo-50 hover:bg-indigo-100 rounded px-2 py-1">Menu</button>
+                        <button data-id="${resto.id}" class="edit-restaurant-btn text-green-600 hover:underline text-xs lg:text-sm mobile-btn bg-green-50 hover:bg-green-100 rounded px-2 py-1">Edit</button>
+                        <button data-id="${resto.id}" class="delete-restaurant-btn bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-2 lg:px-3 rounded-lg text-xs mobile-btn">Delete</button>
+                    </div>
+                `;
+                container.appendChild(restoCard);
+            });
+        }
+
+        async function openEditRestaurantModal(restaurantId) {
+            try {
+                const restaurant = await fetchWithAuth(`/api/restaurants/${restaurantId}/`);
+                document.getElementById('edit-restaurant-id').value = restaurant.id;
+                document.getElementById('edit-restaurant-name').value = restaurant.name;
+                document.getElementById('edit-restaurant-address').value = restaurant.address;
+                document.getElementById('edit-restaurant-phone').value = restaurant.phone_number;
+                document.getElementById('edit-current-logo').src = restaurant.logo || 'https://placehold.co/80/E2E8F0/A0AEC0?text=Logo';
+                document.getElementById('edit-restaurant-modal').style.display = 'block';
+            } catch (error) {
+                alert('Failed to load restaurant details.');
+            }
+        }
+
+        async function openMenuModal(restaurantId, restaurantName) {
+            document.getElementById('menu-modal-title').textContent = `Manage Menu for ${restaurantName}`;
+            document.getElementById('menu-item-restaurant-id').value = restaurantId;
+            document.getElementById('menu-modal').style.display = 'block';
+            
+            try {
+                const menuItems = await fetchWithAuth(`/api/menu-items/?restaurant=${restaurantId}`);
+                displayMenuItems(menuItems, restaurantId);
+            } catch (error) {
+                console.error('Failed to load menu items:', error);
+            }
+        }
+
+        function displayMenuItems(menuItems, restaurantId) {
+            const container = document.getElementById('menu-items-container');
+            container.innerHTML = '';
+            
+            if (!menuItems || menuItems.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-sm">No menu items found.</p>';
+                return;
+            }
+            
+            menuItems.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'flex justify-between items-center p-2 border rounded';
+                itemDiv.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <img src="${item.image || 'https://placehold.co/40/E2E8F0/A0AEC0?text=Food'}" class="w-10 h-10 rounded object-cover">
+                        <div>
+                            <p class="font-semibold text-sm">${item.name}</p>
+                            <p class="text-xs text-gray-600">${item.price} Birr</p>
+                        </div>
+                    </div>
+                    <button data-id="${item.id}" class="delete-menu-item-btn bg-red-500 hover:bg-red-600 text-white text-xs px-2 py-1 rounded">Delete</button>
+                `;
+                container.appendChild(itemDiv);
+            });
+        }
+
+        async function openAddonModal(restaurantId, restaurantName) {
+            document.getElementById('addon-modal-title').textContent = `Manage Add-ons for ${restaurantName}`;
+            document.getElementById('addon-restaurant-id').value = restaurantId;
+            document.getElementById('addon-modal').style.display = 'block';
+            
+            try {
+                const addons = await fetchWithAuth(`/api/addons/?restaurant=${restaurantId}`);
+                displayAddons(addons, restaurantId);
+            } catch (error) {
+                console.error('Failed to load addons:', error);
+            }
+        }
+
+        function displayAddons(addons, restaurantId) {
+            const container = document.getElementById('addons-container');
+            container.innerHTML = '';
+            
+            if (!addons || addons.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-sm">No addons found.</p>';
+                return;
+            }
+            
+            addons.forEach(addon => {
+                const addonDiv = document.createElement('div');
+                addonDiv.className = 'flex justify-between items-center p-2 border rounded';
+                addonDiv.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <img src="${addon.image || 'https://placehold.co/40/E2E8F0/A0AEC0?text=Addon'}" class="w-10 h-10 rounded object-cover">
+                        <div>
+                            <p class="font-semibold text-sm">${addon.name}</p>
+                            <p class="text-xs text-gray-600">${addon.price} Birr</p>
+                        </div>
+                    </div>
+                    <button data-id="${addon.id}" class="delete-addon-btn bg-red-500 hover:bg-red-600 text-white text-xs px-2 py-1 rounded">Delete</button>
+                `;
+                container.appendChild(addonDiv);
+            });
+        }
+
+        async function openPaymentModal(restaurantId, restaurantName) {
+            document.getElementById('payment-modal-title').textContent = `Manage Payments for ${restaurantName}`;
+            document.getElementById('payment-restaurant-id').value = restaurantId;
+            document.getElementById('payment-modal').style.display = 'block';
+            
+            try {
+                const accounts = await fetchWithAuth(`/api/payment-accounts/?restaurant=${restaurantId}`);
+                displayPaymentAccounts(accounts, restaurantId);
+            } catch (error) {
+                console.error('Failed to load payment accounts:', error);
+            }
+        }
+
+        function displayPaymentAccounts(accounts, restaurantId) {
+            const container = document.getElementById('payment-accounts-container');
+            container.innerHTML = '';
+            
+            if (!accounts || accounts.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-sm">No payment accounts found.</p>';
+                return;
+            }
+            
+            accounts.forEach(account => {
+                const accountDiv = document.createElement('div');
+                accountDiv.className = 'flex justify-between items-center p-2 border rounded';
+                accountDiv.innerHTML = `
+                    <div>
+                        <p class="font-semibold text-sm">${account.account_type}</p>
+                        <p class="text-xs text-gray-600">${account.account_number}</p>
+                    </div>
+                    <button data-id="${account.id}" class="delete-payment-account-btn bg-red-500 hover:bg-red-600 text-white text-xs px-2 py-1 rounded">Delete</button>
+                `;
+                container.appendChild(accountDiv);
+            });
+        }
+
+        // --- CHAT MANAGEMENT ---
+        async function fetchConversations() {
+            const container = document.getElementById('conversations-container');
+            container.innerHTML = `<p>Loading conversations...</p>`;
+            try {
+                const conversations = await fetchWithAuth('/api/conversations/');
+                displayConversations(conversations);
+            } catch (error) {
+                container.innerHTML = `<p class="text-red-500">Could not load conversations.</p>`;
+            }
+        }
+
+        function displayConversations(conversations) {
+            const container = document.getElementById('conversations-container');
+            container.innerHTML = '';
+            if (!conversations || conversations.length === 0) {
+                container.innerHTML = `<p class="text-gray-500">No open conversations.</p>`;
+                return;
+            }
+            conversations.forEach(conversation => {
+                const conversationCard = document.createElement('div');
+                conversationCard.className = 'border rounded-lg p-4 cursor-pointer hover:bg-gray-50';
+                conversationCard.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3 class="font-semibold">${conversation.customer_username}</h3>
+                            <p class="text-sm text-gray-600">${conversation.subject}</p>
+                            <p class="text-xs text-gray-500">${new Date(conversation.created_at).toLocaleDateString()}</p>
+                        </div>
+                        <button data-id="${conversation.id}" data-customer="${conversation.customer_username}" class="open-chat-btn bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">
+                            Open Chat
+                        </button>
+                    </div>
+                `;
+                container.appendChild(conversationCard);
+            });
+        }
+
+        async function openChatModal(conversationId, customerName) {
+            document.getElementById('chat-modal-title').textContent = `Chat with ${customerName}`;
+            document.getElementById('chat-modal').style.display = 'block';
+            
+            // Store current conversation ID
+            document.getElementById('chat-modal').dataset.conversationId = conversationId;
+            
+            try {
+                const messages = await fetchWithAuth(`/api/chat-messages/?conversation=${conversationId}`);
+                displayChatMessages(messages);
+            } catch (error) {
+                console.error('Failed to load messages:', error);
+            }
+        }
+
+        function displayChatMessages(messages) {
+            const container = document.getElementById('chat-messages');
+            container.innerHTML = '';
+            
+            if (!messages || messages.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-center">No messages yet. Start the conversation!</p>';
+                return;
+            }
+            
+            messages.forEach(message => {
+                const messageDiv = document.createElement('div');
+                const isFromCurrentUser = message.sender === currentUserId;
+                messageDiv.className = `chat-message ${isFromCurrentUser ? 'chat-sent' : 'chat-received'}`;
+                messageDiv.innerHTML = `
+                    <div class="text-sm font-medium mb-1">${message.sender_username}</div>
+                    <div>${message.message}</div>
+                    <div class="text-xs opacity-75 mt-1">${new Date(message.timestamp).toLocaleString()}</div>
+                `;
+                container.appendChild(messageDiv);
+            });
+            
+            // Scroll to bottom
+            container.scrollTop = container.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const conversationId = document.getElementById('chat-modal').dataset.conversationId;
+            const messageInput = document.getElementById('chat-message-input');
+            const message = messageInput.value.trim();
+            
+            if (!message) return;
+            
+            try {
+                const response = await fetchWithAuth('/api/chat-messages/', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        conversation: conversationId,
+                        message: message
+                    })
+                });
+                
+                if (response) {
+                    messageInput.value = '';
+                    // Reload messages
+                    const messages = await fetchWithAuth(`/api/chat-messages/?conversation=${conversationId}`);
+                    displayChatMessages(messages);
+                }
+            } catch (error) {
+                console.error('Failed to send message:', error);
+                alert('Failed to send message. Please try again.');
+            }
+        }
+
+        // Payment Proof Modal Functions
+        function showPaymentProof(imageUrl) {
+            const modal = document.getElementById('payment-proof-modal');
+            const image = document.getElementById('payment-proof-image');
+            const loadingDiv = document.getElementById('image-loading');
+            
+            console.log('=== PAYMENT PROOF DEBUG ===');
+            console.log('Raw imageUrl received:', imageUrl);
+            console.log('API_BASE_URL:', API_BASE_URL);
+            console.log('Full URL being used:', imageUrl);
+            console.log('URL starts with http:', imageUrl.startsWith('http'));
+            console.log('========================');
+            
+            // Show loading state
+            loadingDiv.style.display = 'flex';
+            image.style.display = 'none';
+            
+            // Add error handling for image loading
+            image.onerror = function() {
+                console.error('=== IMAGE LOAD ERROR ===');
+                console.error('Failed to load payment proof image:', imageUrl);
+                console.error('Image element src:', image.src);
+                console.error('========================');
+                loadingDiv.innerHTML = '<i class="fas fa-exclamation-triangle mr-2"></i>Failed to load image<br><small style="font-size: 10px; color: #999;">Check console for details</small>';
+                loadingDiv.style.color = '#dc2626';
+            };
+            
+            image.onload = function() {
+                console.log('=== IMAGE LOAD SUCCESS ===');
+                console.log('Payment proof image loaded successfully:', imageUrl);
+                console.log('Image dimensions:', image.naturalWidth, 'x', image.naturalHeight);
+                console.log('========================');
+                loadingDiv.style.display = 'none';
+                image.style.display = 'block';
+            };
+            
+            image.src = imageUrl;
+            modal.classList.add('active');
+        }
+
+        function closePaymentProofModal() {
+            const modal = document.getElementById('payment-proof-modal');
+            const image = document.getElementById('payment-proof-image');
+            const loadingDiv = document.getElementById('image-loading');
+            
+            modal.classList.remove('active');
+            
+            // Reset modal state
+            setTimeout(() => {
+                image.src = '';
+                image.style.display = 'none';
+                loadingDiv.style.display = 'flex';
+                loadingDiv.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Loading image...';
+                loadingDiv.style.color = '#666';
+            }, 300); // Wait for modal close animation
+        }
+
+        // Test function to manually test image loading
+        function testImageLoad() {
+            const testUrl = `${API_BASE_URL}/media/payment_proofs/OIP_1_QYPJRbv.webp`;
+            console.log('Testing with known working URL:', testUrl);
+            showPaymentProof(testUrl);
+        }
+
+        // Close modal when clicking outside the image
+        document.getElementById('payment-proof-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closePaymentProofModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closePaymentProofModal();
+            }
+        });
+
+        // --- EVENT LISTENERS & INIT ---
+        document.addEventListener('DOMContentLoaded', async () => {
+            await fetchUserProfile();
+            setupEventListeners();
+            refreshAllOrders();
+        });
+
+        function setupEventListeners() {
+            // Mobile menu toggle
+            const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            if (mobileMenuToggle && mobileMenu) {
+                mobileMenuToggle.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('active');
+                });
+                
+                // Close mobile menu when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (!mobileMenuToggle.contains(e.target) && !mobileMenu.contains(e.target)) {
+                        mobileMenu.classList.remove('active');
+                    }
+                });
+            }
+
+            // Logout buttons
+            const logoutBtn = document.getElementById('logout-button');
+            const logoutBtnMobile = document.getElementById('logout-button-mobile');
+            
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', () => {
+                    localStorage.removeItem('accessToken');
+                    window.location.href = 'subadmin_login.html';
+                });
+            }
+            
+            if (logoutBtnMobile) {
+                logoutBtnMobile.addEventListener('click', () => {
+                    localStorage.removeItem('accessToken');
+                    window.location.href = 'subadmin_login.html';
+                });
+            }
+
+            // Tab switching
+            const tabs = [...document.querySelectorAll('nav[aria-label="Tabs"] button')];
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('tab-active'));
+                    tab.classList.add('tab-active');
+
+                    const targetPanelId = `panel-${tab.id.split('-')[1]}`;
+                    document.querySelectorAll('.mt-6 > div[id^="panel-"]').forEach(p => p.classList.add('hidden'));
+                    document.getElementById(targetPanelId).classList.remove('hidden');
+
+                    if (targetPanelId === 'panel-restaurants') fetchRestaurants();
+                    if (targetPanelId === 'panel-orders') refreshAllOrders();
+                    if (targetPanelId === 'panel-chats') fetchConversations();
+                });
+            });
+
+            // Restaurant Management Event Listeners
+            document.getElementById('add-restaurant-btn').addEventListener('click', () => {
+                document.getElementById('add-restaurant-form').classList.toggle('hidden');
+            });
+            document.getElementById('cancel-add-restaurant-btn').addEventListener('click', () => {
+                document.getElementById('add-restaurant-form').classList.add('hidden');
+            });
+
+            document.getElementById('add-restaurant-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData();
+                formData.append('name', document.getElementById('restaurant-name').value);
+                formData.append('address', document.getElementById('restaurant-address').value);
+                formData.append('phone_number', document.getElementById('restaurant-phone').value);
+                const logoFile = document.getElementById('restaurant-logo').files[0];
+                if (logoFile) formData.append('logo', logoFile);
+
+                try {
+                    await fetchWithAuth('/api/restaurants/', { method: 'POST', body: formData });
+                    e.target.reset();
+                    e.target.classList.add('hidden');
+                    fetchRestaurants();
+                } catch (error) {
+                    alert('Failed to add restaurant.');
+                }
+            });
+
+            document.getElementById('restaurants-container').addEventListener('click', async (e) => {
+                const target = e.target;
+                const restaurantId = target.dataset.id;
+                const restaurantName = target.dataset.name;
+
+                if (target.classList.contains('edit-restaurant-btn')) {
+                    await openEditRestaurantModal(restaurantId);
+                } else if (target.classList.contains('manage-menu-btn')) {
+                    await openMenuModal(restaurantId, restaurantName);
+                } else if (target.classList.contains('manage-addons-btn')) {
+                    await openAddonModal(restaurantId, restaurantName);
+                } else if (target.classList.contains('manage-payments-btn')) {
+                    await openPaymentModal(restaurantId, restaurantName);
+                } else if (target.classList.contains('delete-restaurant-btn')) {
+                    if (confirm('Are you sure you want to delete this restaurant? This cannot be undone.')) {
+                        try {
+                            await fetchWithAuth(`/api/restaurants/${restaurantId}/`, { method: 'DELETE' });
+                            fetchRestaurants();
+                        } catch (error) {
+                            alert('Failed to delete restaurant.');
+                        }
+                    }
+                }
+            });
+
+            // Order management event listeners
+            document.addEventListener('click', async (e) => {
+                if (e.target.classList.contains('approve-order-btn')) {
+                    const orderId = e.target.dataset.id;
+                    try {
+                        // Try different API endpoints for order approval
+                        const response = await fetchWithAuth(`/api/orders/${orderId}/`, { 
+                            method: 'PATCH', 
+                            body: JSON.stringify({ status: 'Preparing' })
+                        });
+                        alert('Order approved successfully!');
+                        refreshAllOrders();
+                    } catch (error) {
+                        console.error('Approval error:', error);
+                        alert('Failed to approve order. Please try again.');
+                    }
+                } else if (e.target.classList.contains('decline-order-btn')) {
+                    const orderId = e.target.dataset.id;
+                    if (confirm('Are you sure you want to decline this order? This action cannot be undone.')) {
+                        try {
+                            const response = await fetchWithAuth(`/api/orders/${orderId}/`, { 
+                                method: 'PATCH', 
+                                body: JSON.stringify({ status: 'Cancelled' })
+                            });
+                            alert('Order declined successfully!');
+                            refreshAllOrders();
+                        } catch (error) {
+                            console.error('Decline error:', error);
+                            alert('Failed to decline order. Please try again.');
+                        }
+                    }
+                } else if (e.target.classList.contains('mark-delivered-btn')) {
+                    const orderId = e.target.dataset.id;
+                    try {
+                        const response = await fetchWithAuth(`/api/orders/${orderId}/`, { 
+                            method: 'PATCH', 
+                            body: JSON.stringify({ status: 'Delivered' })
+                        });
+                        alert('Order marked as delivered!');
+                        refreshAllOrders();
+                    } catch (error) {
+                        console.error('Delivery error:', error);
+                        alert('Failed to mark order as delivered. Please try again.');
+                    }
+                } else if (e.target.classList.contains('mark-completed-btn')) {
+                    const orderId = e.target.dataset.id;
+                    try {
+                        const response = await fetchWithAuth(`/api/orders/${orderId}/mark_as_completed/`, { 
+                            method: 'PATCH'
+                        });
+                        alert('Order marked as completed!');
+                        refreshAllOrders();
+                    } catch (error) {
+                        console.error('Completion error:', error);
+                        alert('Failed to mark order as completed. Please try again.');
+                    }
+                } else if (e.target.classList.contains('remove-order-btn')) {
+                    const orderId = e.target.dataset.id;
+                    if (confirm('Are you sure you want to remove this order?')) {
+                        try {
+                            await fetchWithAuth(`/api/orders/${orderId}/`, { method: 'DELETE' });
+                            alert('Order removed successfully!');
+                            refreshAllOrders();
+                        } catch (error) {
+                            console.error('Remove error:', error);
+                            alert('Failed to remove order. Please try again.');
+                        }
+                    }
+                }
+            });
+
+            // Modal close buttons
+            document.getElementById('cancel-edit-restaurant-btn').addEventListener('click', () => {
+                document.getElementById('edit-restaurant-modal').style.display = 'none';
+            });
+
+            document.getElementById('close-menu-modal-btn').addEventListener('click', () => {
+                document.getElementById('menu-modal').style.display = 'none';
+            });
+
+            document.getElementById('close-addon-modal-btn').addEventListener('click', () => {
+                document.getElementById('addon-modal').style.display = 'none';
+            });
+
+            document.getElementById('close-payment-modal-btn').addEventListener('click', () => {
+                document.getElementById('payment-modal').style.display = 'none';
+            });
+
+            // Chat modal event listeners
+            document.getElementById('close-chat-modal-btn').addEventListener('click', () => {
+                document.getElementById('chat-modal').style.display = 'none';
+            });
+
+            document.getElementById('send-message-btn').addEventListener('click', sendMessage);
+
+            document.getElementById('chat-message-input').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+
+            // Chat conversation click handler
+            document.addEventListener('click', (e) => {
+                if (e.target.classList.contains('open-chat-btn')) {
+                    const conversationId = e.target.dataset.id;
+                    const customerName = e.target.dataset.customer;
+                    openChatModal(conversationId, customerName);
+                }
+            });
+
+            // Form submissions
+            document.getElementById('edit-restaurant-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const restaurantId = document.getElementById('edit-restaurant-id').value;
+                const formData = new FormData();
+                formData.append('name', document.getElementById('edit-restaurant-name').value);
+                formData.append('address', document.getElementById('edit-restaurant-address').value);
+                formData.append('phone_number', document.getElementById('edit-restaurant-phone').value);
+                const logoFile = document.getElementById('edit-restaurant-logo').files[0];
+                if (logoFile) formData.append('logo', logoFile);
+
+                try {
+                    await fetchWithAuth(`/api/restaurants/${restaurantId}/`, { method: 'PUT', body: formData });
+                    document.getElementById('edit-restaurant-modal').style.display = 'none';
+                    fetchRestaurants();
+                } catch (error) {
+                    alert('Failed to update restaurant.');
+                }
+            });
+
+            document.getElementById('add-menu-item-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData();
+                formData.append('restaurant', document.getElementById('menu-item-restaurant-id').value);
+                formData.append('name', document.getElementById('menu-item-name').value);
+                formData.append('description', document.getElementById('menu-item-description').value);
+                formData.append('price', document.getElementById('menu-item-price').value);
+                const imageFile = document.getElementById('menu-item-image').files[0];
+                if (imageFile) formData.append('image', imageFile);
+
+                try {
+                    await fetchWithAuth('/api/menu-items/', { method: 'POST', body: formData });
+                    e.target.reset();
+                    const restaurantId = document.getElementById('menu-item-restaurant-id').value;
+                    const menuItems = await fetchWithAuth(`/api/menu-items/?restaurant=${restaurantId}`);
+                    displayMenuItems(menuItems, restaurantId);
+                } catch (error) {
+                    alert('Failed to add menu item.');
+                }
+            });
+
+            document.getElementById('add-addon-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData();
+                formData.append('restaurant', document.getElementById('addon-restaurant-id').value);
+                formData.append('name', document.getElementById('addon-name').value);
+                formData.append('price', document.getElementById('addon-price').value);
+                const imageFile = document.getElementById('addon-image').files[0];
+                if (imageFile) formData.append('image', imageFile);
+
+                try {
+                    await fetchWithAuth('/api/addons/', { method: 'POST', body: formData });
+                    e.target.reset();
+                    const restaurantId = document.getElementById('addon-restaurant-id').value;
+                    const addons = await fetchWithAuth(`/api/addons/?restaurant=${restaurantId}`);
+                    displayAddons(addons, restaurantId);
+                } catch (error) {
+                    alert('Failed to add addon.');
+                }
+            });
+
+            document.getElementById('add-payment-account-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData();
+                formData.append('restaurant', document.getElementById('payment-restaurant-id').value);
+                formData.append('account_type', document.getElementById('payment-account-type').value);
+                formData.append('account_number', document.getElementById('payment-account-number').value);
+
+                try {
+                    await fetchWithAuth('/api/payment-accounts/', { method: 'POST', body: formData });
+                    e.target.reset();
+                    const restaurantId = document.getElementById('payment-restaurant-id').value;
+                    const accounts = await fetchWithAuth(`/api/payment-accounts/?restaurant=${restaurantId}`);
+                    displayPaymentAccounts(accounts, restaurantId);
+                } catch (error) {
+                    alert('Failed to add payment account.');
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

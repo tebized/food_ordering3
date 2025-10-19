@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Menu</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap");
+
+        :root {
+            --primary-color: #26a69a;
+            /* Teal */
+            --background-color: white;
+            --card-background: #f5f5f5;
+            --text-color: #333;
+            --star-color: #fdd835;
+            /* Yellow for star */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Roboto", sans-serif;
+            background-color: #ccc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .mobile-container {
+            width: 375px;
+            height: 812px;
+            background-color: var(--background-color);
+            border-radius: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        header {
+            background-color: var(--primary-color);
+            height: 250px;
+            position: relative;
+        }
+
+        .header-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        header a {
+            position: absolute;
+            top: 30px;
+            left: 25px;
+            color: white;
+            font-size: 20px;
+            z-index: 3;
+            background-color: rgba(0, 0, 0, 0.4);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .profile-icon {
+            position: absolute;
+            top: 30px;
+            right: 25px;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(0, 0, 0, 0.4);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 20px;
+            z-index: 3;
+        }
+
+        /* Main Content */
+        main {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 0 20px;
+            position: relative;
+            background-color: white;
+        }
+
+        .restaurant-title-wrapper {
+            /* This container helps with positioning */
+        }
+
+        .restaurant-title-wrapper h1 {
+            background-color: #d9d9d9;
+            padding: 10px 30px;
+            border-radius: 25px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            font-size: 24px;
+            color: var(--text-color);
+            text-align: center;
+            width: fit-content;
+            margin: -25px auto 20px auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .food-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding-bottom: 90px;
+            /* Space for footer */
+        }
+
+        .food-card {
+            display: flex;
+            align-items: center;
+            background-color: var(--card-background);
+            border-radius: 15px;
+            padding: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .food-card:hover {
+            background-color: #e0e0e0;
+        }
+
+        .food-card img {
+            width: 90px;
+            height: 90px;
+            border-radius: 10px;
+            object-fit: cover;
+            margin-right: 15px;
+        }
+
+        .food-details {
+            flex-grow: 1;
+        }
+
+        .food-details h2 {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .rating {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 12px;
+        }
+
+        .rating .fa-star {
+            color: var(--star-color);
+            margin-right: 5px;
+        }
+
+        .price {
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        /* Footer Navigation */
+        footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #d9d9d9;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 70px;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding: 5px 0;
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: black;
+            font-size: 12px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .nav-item i {
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+
+        .nav-item.active {
+            color: var(--primary-color);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="mobile-container">
+        <header>
+            <a href="javascript:history.back()">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <div class="profile-icon">
+                <i class="fas fa-user"></i>
+            </div>
+            <img src="https://placehold.co/375x250/26A69A/FFFFFF?text=Logo" alt="Restaurant Header" class="header-image"
+                id="header-image">
+            <div class="restaurant-title-wrapper">
+                <h1 id="restaurant-name">Loading...</h1>
+            </div>
+        </header>
+
+        <main>
+            <section class="food-list" id="food-list">
+                <p id="loading-message">Loading menu...</p>
+            </section>
+        </main>
+
+        <footer>
+            <a href="customer_home.html" class="nav-item active">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="customer_checkout.html" class="nav-item">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Buy</span>
+            </a>
+            <a href="customer_orders.html" class="nav-item">
+                <i class="fas fa-shopping-bag"></i>
+                <span>My Order</span>
+            </a>
+            <a href="profile.html" class="nav-item">
+                <i class="fas fa-user"></i>
+                <span>Profile</span>
+            </a>
+        </footer>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://127.0.0.1:8000';
+        const params = new URLSearchParams(window.location.search);
+        const restaurantId = params.get('id');
+
+        const restaurantNameEl = document.getElementById('restaurant-name');
+        const headerImageEl = document.getElementById('header-image');
+        const foodListEl = document.getElementById('food-list');
+        const loadingMessage = document.getElementById('loading-message');
+
+        if (!restaurantId) {
+            alert('No restaurant selected!');
+            window.location.href = 'customer_dashboard.html';
+        }
+
+        // NEW: Robust fetch function with modern authentication
+        async function fetchWithAuth(endpoint, options = {}) {
+            const token = localStorage.getItem('accessToken');
+
+            if (!token) {
+                window.location.href = 'customer_login.html';
+                return;
+            }
+
+            const headers = {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+                ...options.headers,
+            };
+
+            const response = await fetch(`${API_BASE_URL}${endpoint}`, { ...options, headers });
+
+            if (response.status === 401) {
+                localStorage.removeItem('accessToken');
+                window.location.href = 'customer_login.html';
+                throw new Error('Unauthorized');
+            }
+
+            if (!response.ok) {
+                throw new Error(`API Error: ${response.status}`);
+            }
+
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.indexOf("application/json") !== -1) {
+                return response.json();
+            } else {
+                return null;
+            }
+        }
+
+        // New function for guest browsing (no authentication required)
+        async function fetchPublic(endpoint, options = {}) {
+            const headers = {
+                'Content-Type': 'application/json',
+                ...options.headers,
+            };
+
+            const response = await fetch(`${API_BASE_URL}${endpoint}`, { ...options, headers });
+
+            if (!response.ok) {
+                throw new Error(`API Error: ${response.status}`);
+            }
+
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.indexOf("application/json") !== -1) {
+                return response.json();
+            } else {
+                return null;
+            }
+        }
+
+        async function loadPageData() {
+            try {
+                // Fetch public data (no authentication required)
+                const [restaurant, menuItems] = await Promise.all([
+                    fetchPublic(`/api/restaurants/${restaurantId}/`),
+                    fetchPublic(`/api/menu-items/?restaurant=${restaurantId}`)
+                ]);
+
+                restaurantNameEl.textContent = restaurant.name;
+
+                if (restaurant.logo) {
+                    headerImageEl.src = restaurant.logo;
+                } else if (menuItems.length > 0 && menuItems[0].image) {
+                    headerImageEl.src = menuItems[0].image;
+                }
+
+                renderMenuItems(menuItems);
+
+            } catch (error) {
+                console.error("Failed to load page data:", error);
+                loadingMessage.textContent = 'Could not load menu.';
+            }
+        }
+
+        function renderMenuItems(items) {
+            foodListEl.innerHTML = '';
+            if (!items || items.length === 0) {
+                foodListEl.innerHTML = '<p>This restaurant has no menu items available.</p>';
+                return;
+            }
+
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'food-card';
+                card.dataset.id = item.id;
+                card.innerHTML = `
+                    <img src="${item.image || 'https://placehold.co/90/F5F5F5/333?text=Food'}" alt="${item.name}">
+                    <div class="food-details">
+                        <h2>${item.name}</h2>
+                         <div class="price">${item.price} Birr</div>
+                        <div class="rating">
+                            <i class="fas fa-star"></i>
+                            <span>${item.average_rating ? item.average_rating.toFixed(1) : 'No ratings'}</span>
+                            ${item.rating_count ? `<span class="rating-count">(${item.rating_count})</span>` : ''}
+                        </div>
+                    </div>
+                `;
+                foodListEl.appendChild(card);
+            });
+        }
+
+        foodListEl.addEventListener('click', (e) => {
+            const card = e.target.closest('.food-card');
+            if (card) {
+                const itemId = card.dataset.id;
+                if (itemId) {
+                    window.location.href = `food_detail.html?id=${itemId}`;
+                }
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', loadPageData);
+    </script>
+</body>
+
+</html>

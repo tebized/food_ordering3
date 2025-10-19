@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Details</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap");
+
+        :root {
+            --primary-color: #26a69a;
+            --background-color: #e0e0e0;
+            --card-background: #f5f5f5;
+            --text-color: #333;
+            --star-color: #fdd835;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Roboto", sans-serif;
+            background-color: #ccc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .mobile-container {
+            width: 375px;
+            height: 812px;
+            background-color: var(--primary-color);
+            border-radius: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            height: 300px;
+            position: relative;
+        }
+
+        .header-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .back-icon,
+        .profile-icon {
+            position: absolute;
+            top: 30px;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: black;
+            font-size: 20px;
+            z-index: 10;
+            text-decoration: none;
+        }
+
+        .back-icon {
+            left: 25px;
+        }
+
+        .profile-icon {
+            right: 25px;
+        }
+
+        main {
+            flex-grow: 1;
+            background-color: white;
+            border-top-left-radius: 40px;
+            border-top-right-radius: 40px;
+            margin-top: -50px;
+            position: relative;
+            z-index: 5;
+            padding: 20px;
+            overflow-y: auto;
+            padding-bottom: 100px;
+        }
+
+        .details-card {
+            position: relative;
+        }
+
+        .title-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            gap: 10px;
+        }
+
+        .title-section h2 {
+            font-size: 32px;
+            font-weight: 700;
+            flex-grow: 1;
+        }
+
+        .rating-badge {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 18px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            flex-shrink: 0;
+        }
+
+        .rating-badge .fa-star {
+            color: var(--star-color);
+        }
+
+        .bookmark-icon {
+            font-size: 24px;
+            color: #555;
+            cursor: pointer;
+        }
+
+        .bookmark-icon.saved {
+            color: var(--primary-color);
+            font-weight: 900;
+            /* Makes it solid */
+        }
+
+        main h3 {
+            font-size: 20px;
+            font-weight: 500;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        .addons {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .addon-item {
+            position: relative;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .addon-item img {
+            width: 80px;
+            height: 80px;
+            border-radius: 15px;
+            object-fit: cover;
+        }
+
+        .addon-item span {
+            display: block;
+            margin-top: 5px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .addon-controls {
+            position: absolute;
+            bottom: 25px;
+            right: -5px;
+        }
+
+        .quantity-selector,
+        .add-btn {
+            background-color: white;
+            border-radius: 50px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+        }
+
+        .add-btn {
+            width: 30px;
+            height: 30px;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            border: none;
+        }
+
+        .quantity-selector {
+            display: none;
+        }
+
+        .quantity-selector button {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+        }
+
+        .quantity-selector .quantity {
+            font-size: 16px;
+            font-weight: 500;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        .main-quantity-selector {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .main-quantity-selector span {
+            font-size: 20px;
+            font-weight: 500;
+        }
+
+        .main-quantity-selector .quantity-selector {
+            display: flex;
+        }
+
+        .total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            font-size: 22px;
+            font-weight: 500;
+        }
+
+        #total-price {
+            font-weight: 700;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .action-buttons button {
+            flex-grow: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .order-btn,
+        .cart-btn {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #d9d9d9;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 70px;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding: 5px 0;
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: black;
+            font-size: 12px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .nav-item i {
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+
+        .nav-item.active {
+            color: var(--primary-color);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="mobile-container">
+        <header>
+            <a href="javascript:history.back()" class="back-icon"><i class="fas fa-arrow-left"></i></a>
+            <a href="profile.html">
+                <div class="profile-icon"><i class="fas fa-user"></i></div>
+            </a>
+            <img src="https://placehold.co/375x300/26A69A/FFFFFF?text=Food" alt="Food Item" class="header-image"
+                id="header-image">
+        </header>
+
+        <main>
+            <div class="details-card">
+                <div class="title-section">
+                    <h2 id="food-name">Loading...</h2>
+                    <div class="rating-badge"><i class="fas fa-star"></i> <span id="rating">Loading...</span></div>
+                    <i class="far fa-bookmark bookmark-icon" id="bookmark-icon"></i>
+                </div>
+
+                <div class="main-quantity-selector">
+                    <span>Quantity:</span>
+                    <div class="quantity-selector">
+                        <button class="main-minus-btn">-</button>
+                        <span class="quantity" id="main-quantity">1</span>
+                        <button class="main-plus-btn">+</button>
+                    </div>
+                </div>
+
+                <h3>Add ons</h3>
+                <div class="addons" id="addons-container">
+                    <p id="loading-addons">Loading add-ons...</p>
+                </div>
+
+                <div class="total">
+                    <span>Total:</span>
+                    <span id="total-price">0 Birr</span>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="order-btn">Order now</button>
+                    <button class="cart-btn" onclick="checkAuthAndRedirect('buy.html')">Add to Cart</button>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <a href="customer_home.html" class="nav-item active"><i class="fas fa-home"></i><span>Home</span></a>
+            <a href="customer_checkout.html" class="nav-item"><i class="fas fa-shopping-cart"></i><span>Buy</span></a>
+            <a href="customer_orders.html" class="nav-item"><i class="fas fa-shopping-bag"></i><span>My Order</span></a>
+            <a href="profile.html" class="nav-item"><i class="fas fa-user"></i><span>Profile</span></a>
+        </footer>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://127.0.0.1:8000';
+        const params = new URLSearchParams(window.location.search);
+        const menuItemId = params.get('id');
+
+        if (!menuItemId) {
+            alert('No food item selected!');
+            window.location.href = 'customer_home.html';
+        }
+
+        let mainDish = null;
+        let mainDishQuantity = 1;
+        let addonsData = [];
+        let selectedAddons = {};
+        let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+
+        const headerImage = document.getElementById('header-image');
+        const foodNameEl = document.getElementById('food-name');
+        const totalPriceElement = document.getElementById("total-price");
+        const addonsContainer = document.getElementById("addons-container");
+        const mainQuantityEl = document.getElementById("main-quantity");
+        const bookmarkIcon = document.getElementById('bookmark-icon');
+
+        // NEW: Robust fetch function with modern authentication
+        async function fetchWithAuth(endpoint, options = {}) {
+            const token = localStorage.getItem('accessToken');
+
+            if (!token) {
+                window.location.href = 'customer_login.html';
+                return;
+            }
+
+            const headers = {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+                ...options.headers,
+            };
+
+            const response = await fetch(`${API_BASE_URL}${endpoint}`, { ...options, headers });
+
+            if (response.status === 401) {
+                localStorage.removeItem('accessToken');
+                window.location.href = 'customer_login.html';
+                throw new Error('Unauthorized');
+            }
+
+            if (!response.ok) {
+                throw new Error(`API Error: ${response.status}`);
+            }
+
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.indexOf("application/json") !== -1) {
+                return response.json();
+            } else {
+                return null;
+            }
+        }
+
+        // New function for guest browsing (no authentication required)
+        async function fetchPublic(endpoint, options = {}) {
+            const headers = {
+                'Content-Type': 'application/json',
+                ...options.headers,
+            };
+
+            const response = await fetch(`${API_BASE_URL}${endpoint}`, { ...options, headers });
+
+            if (!response.ok) {
+                throw new Error(`API Error: ${response.status}`);
+            }
+
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.indexOf("application/json") !== -1) {
+                return response.json();
+            } else {
+                return null;
+            }
+        }
+
+        async function fetchPageData() {
+            try {
+                const item = await fetchPublic(`/api/menu-items/${menuItemId}/`);
+                mainDish = item;
+                headerImage.src = item.image || 'https://placehold.co/375x300/26A69A/FFFFFF?text=Food';
+                foodNameEl.textContent = item.name;
+                
+                // Update rating
+                const ratingEl = document.getElementById('rating');
+                if (ratingEl) {
+                    ratingEl.textContent = item.average_rating ? item.average_rating.toFixed(1) : 'No ratings';
+                }
+
+                checkIfFavorite();
+                await fetchAddons(item.restaurant);
+                updateTotalPrice();
+
+            } catch (error) {
+                console.error("Failed to load food details:", error);
+                if (error.message !== 'Unauthorized') {
+                    foodNameEl.textContent = 'Error';
+                }
+            }
+        }
+
+        function checkIfFavorite() {
+            if (favorites.some(fav => fav.id === mainDish.id)) {
+                bookmarkIcon.classList.remove('far'); // regular (empty)
+                bookmarkIcon.classList.add('fas', 'saved'); // solid (filled)
+            } else {
+                bookmarkIcon.classList.remove('fas', 'saved');
+                bookmarkIcon.classList.add('far');
+            }
+        }
+
+        bookmarkIcon.addEventListener('click', () => {
+            const favoriteIndex = favorites.findIndex(fav => fav.id === mainDish.id);
+            if (favoriteIndex > -1) {
+                favorites.splice(favoriteIndex, 1); // Remove from favorites
+            } else {
+                favorites.push({
+                    id: mainDish.id,
+                    name: mainDish.name,
+                    image: mainDish.image,
+                    restaurant: mainDish.restaurant,
+                });
+            }
+            localStorage.setItem('favorites', JSON.stringify(favorites));
+            checkIfFavorite();
+        });
+
+        async function fetchAddons(restaurantId) {
+            try {
+                const addons = await fetchPublic(`/api/addons/?restaurant=${restaurantId}`);
+                addonsData = addons;
+                renderAddons(addonsData);
+            } catch (error) {
+                console.error("Failed to load addons:", error);
+                if (error.message !== 'Unauthorized') {
+                    addonsContainer.innerHTML = '<p class="text-sm text-gray-500">No add-ons available.</p>';
+                }
+            }
+        }
+
+        function renderAddons(addons) {
+            addonsContainer.innerHTML = '';
+            if (!addons || addons.length === 0) {
+                addonsContainer.innerHTML = '<p class="text-sm text-gray-500">No add-ons for this item.</p>';
+                return;
+            }
+            addons.forEach(addon => {
+                const addonEl = document.createElement('div');
+                addonEl.className = 'addon-item';
+                addonEl.dataset.id = addon.id;
+                addonEl.innerHTML = `
+                    <img src="${addon.image || 'https://placehold.co/80x80/f5f5f5/333?text=Item'}" alt="${addon.name}">
+                    <span>${addon.name}</span>
+                    <div class="addon-controls">
+                        <button class="add-btn" data-id="${addon.id}">+</button>
+                        <div class="quantity-selector" data-id="${addon.id}">
+                            <button class="minus-btn" data-id="${addon.id}">-</button>
+                            <span class="quantity">1</span>
+                            <button class="plus-btn" data-id="${addon.id}">+</button>
+                        </div>
+                    </div>
+                `;
+                addonsContainer.appendChild(addonEl);
+            });
+        }
+
+        function updateTotalPrice() {
+            if (!mainDish) return;
+            let total = parseFloat(mainDish.price) * mainDishQuantity;
+            for (const addonId in selectedAddons) {
+                const addon = addonsData.find(a => a.id == addonId);
+                if (addon) {
+                    total += parseFloat(addon.price) * selectedAddons[addonId];
+                }
+            }
+            totalPriceElement.textContent = `${total.toFixed(2)} Birr`;
+        }
+
+        document.querySelector('.main-plus-btn').addEventListener('click', () => {
+            mainDishQuantity++;
+            mainQuantityEl.textContent = mainDishQuantity;
+            updateTotalPrice();
+        });
+
+        document.querySelector('.main-minus-btn').addEventListener('click', () => {
+            if (mainDishQuantity > 1) {
+                mainDishQuantity--;
+                mainQuantityEl.textContent = mainDishQuantity;
+                updateTotalPrice();
+            }
+        });
+
+        addonsContainer.addEventListener("click", (e) => {
+            const target = e.target;
+            const addonId = target.dataset.id;
+            if (!addonId) return;
+
+            const quantitySelector = target.closest('.addon-item').querySelector('.quantity-selector');
+            const addBtn = target.closest('.addon-item').querySelector('.add-btn');
+
+            if (target.classList.contains('add-btn')) {
+                selectedAddons[addonId] = 1;
+                addBtn.style.display = 'none';
+                quantitySelector.style.display = 'flex';
+            } else if (target.classList.contains('plus-btn')) {
+                selectedAddons[addonId]++;
+            } else if (target.classList.contains('minus-btn')) {
+                selectedAddons[addonId]--;
+            }
+
+            if (selectedAddons[addonId] > 0) {
+                quantitySelector.querySelector('.quantity').textContent = selectedAddons[addonId];
+            } else {
+                delete selectedAddons[addonId];
+                addBtn.style.display = 'flex';
+                quantitySelector.style.display = 'none';
+            }
+            updateTotalPrice();
+        });
+
+        function addToCart() {
+            if (!mainDish) return;
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            let restaurantId = localStorage.getItem('restaurantId');
+
+            if (restaurantId && restaurantId != mainDish.restaurant) {
+                // Using a custom modal/dialog instead of confirm() is better for UX, but confirm() is simpler for now.
+                if (confirm("You have items from another restaurant in your cart. Clear cart and start a new order here?")) {
+                    cart = [];
+                } else {
+                    return;
+                }
+            }
+
+            localStorage.setItem('restaurantId', mainDish.restaurant);
+
+            const mainDishIndex = cart.findIndex(item => item.id === mainDish.id && !item.isAddon);
+            if (mainDishIndex > -1) cart.splice(mainDishIndex, 1);
+            cart = cart.filter(item => !item.isAddon);
+
+            cart.push({ ...mainDish, quantity: mainDishQuantity, isAddon: false });
+
+            for (const addonId in selectedAddons) {
+                if (selectedAddons[addonId] > 0) {
+                    const addon = addonsData.find(a => a.id == addonId);
+                    cart.push({ ...addon, quantity: selectedAddons[addonId], isAddon: true });
+                }
+            }
+
+            localStorage.setItem('cart', JSON.stringify(cart));
+            return true;
+        }
+
+        const orderBtn = document.querySelector(".order-btn");
+        const cartBtn = document.querySelector(".cart-btn");
+
+        orderBtn.addEventListener("click", () => {
+            if (addToCart()) {
+                window.location.href = 'checkout.html';
+            }
+        });
+
+        cartBtn.addEventListener("click", () => {
+            if (addToCart()) {
+                // Using a custom notification is better UX than alert()
+                alert(`Added to cart!`);
+            }
+        });
+
+        // Function to check authentication and redirect
+        function checkAuthAndRedirect(page) {
+            const token = localStorage.getItem('accessToken');
+            if (!token) {
+                if (confirm('You need to sign in to add items to cart. Would you like to sign in now?')) {
+                    window.location.href = 'customer_login.html';
+                }
+            } else {
+                if (addToCart()) {
+                    window.location.href = page;
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchPageData);
+    </script>
+</body>
+
+</html>

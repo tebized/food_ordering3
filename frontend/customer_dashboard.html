@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Delivery App - Restaurants</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* General Body Styles */
+        body {
+            font-family: "Inter", sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #E2E8F0;
+            /* gray-300 */
+            margin: 0;
+        }
+
+        /* Mobile Screen Container */
+        .mobile-screen {
+            max-width: 375px;
+            width: 100%;
+            height: 812px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            background-color: #F7FAFC;
+            /* gray-100 */
+            border-radius: 24px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .logo-image {
+            width: 48px;
+            height: 48px;
+            border-radius: 9999px;
+            object-fit: cover;
+        }
+
+        .welcome-text {
+            text-align: right;
+        }
+
+        .welcome-text p {
+            margin: 0;
+            color: #4A5568;
+            /* gray-600 */
+            font-size: 14px;
+        }
+
+        .welcome-text .username {
+            font-weight: 600;
+            color: #19b6a5;
+        }
+
+        .profile-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .profile-icon-wrapper {
+            width: 48px;
+            height: 48px;
+            background-color: #d1d5db;
+            /* gray-300 */
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            /* gray-500 */
+        }
+
+        /* Search Bar */
+        .search-container {
+            position: relative;
+            margin-bottom: 24px;
+        }
+
+        .search-input {
+            width: 100%;
+            background-color: #EDF2F7;
+            /* gray-200 */
+            border-radius: 9999px;
+            /* Pill shape */
+            padding: 12px 16px 12px 40px;
+            color: #2D3748;
+            /* gray-800 */
+            border: 1px solid transparent;
+            box-sizing: border-box;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #14b8a6;
+            box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.5);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #A0AEC0;
+            /* gray-400 */
+        }
+
+        /* Filter Buttons */
+        .filter-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .filter-buttons a {
+            text-decoration: none;
+        }
+
+        .filter-button {
+            font-weight: 600;
+            padding: 12px 0;
+            border-radius: 9999px;
+            /* Pill shape */
+            transition: transform 0.1s ease;
+            border: 2px solid #19b6a5;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .filter-button.active {
+            background-color: #19b6a5;
+            color: white;
+            border-color: #19b6a5;
+        }
+
+        .filter-button:not(.active) {
+            background-color: transparent;
+            color: #19b6a5;
+            border-color: #19b6a5;
+        }
+
+        /* Main Content */
+        .main-content {
+            background-color: transparent;
+            padding: 0;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+            /* Increased gap */
+            overflow-y: auto;
+            margin: 0 -16px;
+            padding: 0 16px;
+            padding-bottom: 90px;
+        }
+
+        /* Restaurant Card Styles */
+        .restaurant-container {
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .restaurant-container:hover {
+            transform: translateY(-5px);
+        }
+
+        .restaurant-name {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2D3748;
+            /* gray-800 */
+            margin-bottom: 8px;
+        }
+
+        .restaurant-card {
+            background-color: #FFFFFF;
+            border-radius: 24px;
+            position: relative;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .image-gallery {
+            padding: 16px;
+            border-radius: 24px;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 8px;
+            height: 180px;
+            position: relative;
+        }
+
+        .gallery-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 12px;
+        }
+
+        .main-img {
+            grid-row: 1 / 3;
+            grid-column: 1 / 2;
+        }
+
+        .side-img-1 {
+            grid-row: 1 / 2;
+            grid-column: 2 / 3;
+        }
+
+        .side-img-2 {
+            position: relative;
+            grid-row: 2 / 3;
+            grid-column: 2 / 3;
+        }
+
+        .image-count-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            border-radius: 12px;
+        }
+
+        /* UPDATED: Footer Styles to match reference */
+        footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #d9d9d9;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 70px;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding: 5px 0;
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: black;
+            font-size: 12px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .nav-item i {
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+
+        .nav-item.active {
+            color: #26a69a;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="mobile-screen">
+        <header class="header">
+            <img src="images/DimScreen_(1)_xNOPPUxEvV.png" alt="App Logo" class="logo-image">
+            <div class="profile-section">
+                <div class="welcome-text">
+                    <p>Welcome</p>
+                    <p class="username" id="username-display">@user</p>
+                </div>
+                <a href="profile.html">
+                    <div class="profile-icon-wrapper">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                            <circle cx="12" cy="7" r="4" />
+                        </svg>
+                    </div>
+                </a>
+            </div>
+        </header>
+
+        <div class="search-container">
+            <input type="text" placeholder="Search" class="search-input" id="search-input">
+            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.3-4.3" />
+            </svg>
+        </div>
+
+        <div class="filter-buttons">
+            <a href="customer_home.html"><button class="filter-button">Food</button></a>
+            <a href="#"><button class="filter-button active">Restaurant</button></a>
+        </div>
+
+        <main class="main-content" id="main-content">
+            <p id="loading-message">Loading restaurants...</p>
+        </main>
+
+        <!-- UPDATED: Footer with new icons -->
+        <footer>
+            <a href="customer_home.html" class="nav-item active"><i class="fas fa-home"></i><span>Home</span></a>
+            <a href="#" onclick="checkAuthAndRedirect('buy.html')" class="nav-item"><i class="fas fa-shopping-cart"></i><span>Buy</span></a>
+            <a href="#" onclick="checkAuthAndRedirect('customer_orders.html')" class="nav-item"><i class="fas fa-shopping-bag"></i><span>My Order</span></a>
+            <a href="#" onclick="checkAuthAndRedirect('profile.html')" class="nav-item"><i class="fas fa-user"></i><span>Profile</span></a>
+        </footer>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://127.0.0.1:8000';
+        let allRestaurants = [];
+        let allMenuItems = [];
+
+        const usernameDisplay = document.getElementById('username-display');
+        const mainContent = document.getElementById('main-content');
+        const searchInput = document.getElementById('search-input');
+        const loadingMessage = document.getElementById('loading-message');
+
+        async function fetchWithAuth(endpoint, options = {}) {
+            const token = localStorage.getItem('accessToken');
+
+            if (!token) {
+                window.location.href = 'customer_login.html';
+                return;
+            }
+
+            const headers = {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+                ...options.headers,
+            };
+
+            const response = await fetch(`${API_BASE_URL}${endpoint}`, { ...options, headers });
+
+            if (response.status === 401) {
+                localStorage.removeItem('accessToken');
+                window.location.href = 'customer_login.html';
+                throw new Error('Unauthorized');
+            }
+
+            if (!response.ok) {
+                throw new Error(`API Error: ${response.status}`);
+            }
+
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.indexOf("application/json") !== -1) {
+                return response.json();
+            } else {
+                return null;
+            }
+        }
+
+        // New function for guest browsing (no authentication required)
+        async function fetchPublic(endpoint, options = {}) {
+            const headers = {
+                'Content-Type': 'application/json',
+                ...options.headers,
+            };
+
+            const response = await fetch(`${API_BASE_URL}${endpoint}`, { ...options, headers });
+
+            if (!response.ok) {
+                throw new Error(`API Error: ${response.status}`);
+            }
+
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.indexOf("application/json") !== -1) {
+                return response.json();
+            } else {
+                return null;
+            }
+        }
+
+        async function fetchInitialData() {
+            try {
+                // Check if user is logged in
+                const token = localStorage.getItem('accessToken');
+                let user = null;
+                
+                if (token) {
+                    try {
+                        user = await fetchWithAuth('/api/profile/');
+                        if (user && user.username) {
+                            usernameDisplay.textContent = `@${user.username}`;
+                        }
+                    } catch (error) {
+                        // Token is invalid, clear it and continue as guest
+                        localStorage.removeItem('accessToken');
+                        usernameDisplay.textContent = 'Guest';
+                    }
+                } else {
+                    usernameDisplay.textContent = 'Guest';
+                }
+
+                // Fetch public data (no authentication required)
+                const [restaurants, menuItems] = await Promise.all([
+                    fetchPublic('/api/restaurants/'),
+                    fetchPublic('/api/menu-items/')
+                ]);
+
+                allRestaurants = restaurants;
+                allMenuItems = menuItems;
+                renderRestaurantCards(allRestaurants);
+
+            } catch (error) {
+                console.error("Failed to load initial data:", error);
+                loadingMessage.textContent = 'Could not load data. Please refresh.';
+                loadingMessage.classList.add('text-red-500');
+            }
+        }
+
+        function renderRestaurantCards(restaurantsToRender) {
+            mainContent.innerHTML = '';
+            if (!restaurantsToRender || restaurantsToRender.length === 0) {
+                mainContent.innerHTML = '<p>No restaurants found.</p>';
+                return;
+            }
+
+            restaurantsToRender.forEach(resto => {
+                const container = document.createElement('div');
+                container.className = 'restaurant-container';
+                container.dataset.restaurantId = resto.id;
+
+                const itemsForThisRestaurant = allMenuItems.filter(item => item.restaurant === resto.id);
+                const imageUrls = itemsForThisRestaurant.map(item => item.image).filter(Boolean);
+
+                const mainImg = imageUrls[0] || 'https://placehold.co/400x400/CBD5E0/4A5568?text=Food';
+                const sideImg1 = imageUrls[1] || 'https://placehold.co/200x200/CBD5E0/4A5568?text=Food';
+                const sideImg2 = imageUrls[2] || 'https://placehold.co/200x200/CBD5E0/4A5568?text=Food';
+                const hasMoreImages = imageUrls.length > 2;
+
+                let sideImg2Html = `<img src="${sideImg2}" alt="${resto.name}" class="gallery-img">`;
+                if (hasMoreImages) {
+                    const moreCount = imageUrls.length - 2;
+                    sideImg2Html = `
+                        <img src="${sideImg2}" alt="${resto.name}" class="gallery-img">
+                        <div class="image-count-overlay">+${moreCount}</div>
+                    `;
+                }
+
+                container.innerHTML = `
+                    <h3 class="restaurant-name">${resto.name}</h3>
+                    <div class="restaurant-card">
+                        <div class="image-gallery">
+                            <img src="${mainImg}" alt="${resto.name}" class="gallery-img main-img">
+                            <img src="${sideImg1}" alt="${resto.name}" class="gallery-img side-img-1">
+                            <div class="side-img-2">
+                                ${sideImg2Html}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                mainContent.appendChild(container);
+            });
+        }
+
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const filteredRestaurants = allRestaurants.filter(resto =>
+                resto.name.toLowerCase().includes(searchTerm)
+            );
+            renderRestaurantCards(filteredRestaurants);
+        });
+
+        mainContent.addEventListener('click', (e) => {
+            const card = e.target.closest('.restaurant-container');
+            if (card) {
+                const restaurantId = card.dataset.restaurantId;
+                if (restaurantId) {
+                    window.location.href = `menu.html?id=${restaurantId}`;
+                }
+            }
+        });
+
+        // Function to check authentication and redirect
+        function checkAuthAndRedirect(page) {
+            const token = localStorage.getItem('accessToken');
+            if (!token) {
+                if (confirm('You need to sign in to access this page. Would you like to sign in now?')) {
+                    window.location.href = 'customer_login.html';
+                }
+            } else {
+                window.location.href = page;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchInitialData);
+    </script>
+</body>
+
+</html>

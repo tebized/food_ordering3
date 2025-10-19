@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Cart</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap");
+
+        :root {
+            --primary-color: #2a9d8f;
+            --secondary-color: #c4c4c4;
+            --background-color: #f0f0f0;
+            --card-background: #e9e9e9;
+            --text-color: #333;
+            --danger-color: #e74c3c;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Roboto", sans-serif;
+            background-color: var(--background-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-color);
+        }
+
+        .mobile-container {
+            width: 375px;
+            height: 812px;
+            background-color: #f8f8f8;
+            border-radius: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 10px 20px;
+        }
+
+        .cart-header h1 {
+            font-size: 24px;
+            font-weight: 500;
+        }
+
+        .profile-icon {
+            font-size: 40px;
+            color: #555;
+        }
+
+        .cart-items {
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        .empty-cart-message {
+            text-align: center;
+            color: #888;
+            padding-top: 50px;
+        }
+
+        /* Item Styles */
+        .cart-item {
+            background-color: var(--card-background);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .cart-item img {
+            width: 80px;
+            height: 80px;
+            border-radius: 15px;
+            object-fit: cover;
+            margin-right: 15px;
+        }
+
+        .item-details {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .item-name {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .item-meta {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .quantity-btn {
+            background: none;
+            border: 1px solid #aaa;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .item-quantity {
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .remove-item-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cart-summary {
+            padding: 20px 10px 0;
+        }
+
+        .total-section {
+            display: flex;
+            justify-content: space-between;
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 25px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 18px;
+            border: none;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .btn-pay {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-pay:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .btn-home {
+            background-color: var(--secondary-color);
+            color: #555;
+        }
+
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--card-background);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            border-radius: 30px 30px 0 0;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: black;
+        }
+
+        .nav-item i {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+
+        .nav-item span {
+            font-size: 12px;
+        }
+
+        .nav-item.active {
+            color: var(--primary-color);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="mobile-container">
+        <header class="cart-header">
+            <h1 id="cart-title">My Cart</h1>
+            <i class="fa-solid fa-user-circle profile-icon"></i>
+        </header>
+
+        <main class="cart-items" id="cart-items-container">
+            <!-- Cart items will be dynamically inserted here -->
+        </main>
+
+        <section class="cart-summary">
+            <div class="total-section">
+                <span>Total:</span>
+                <span id="total-price">0.00</span>
+            </div>
+            <button id="pay-btn" class="btn btn-pay">Proceed to Pay</button>
+            <a href="customer_home.html" class="btn btn-home">Back to Home</a>
+        </section>
+
+        <nav class="bottom-nav">
+            <!-- Your navigation items -->
+        </nav>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const cartItemsContainer = document.getElementById('cart-items-container');
+            const cartTitle = document.getElementById('cart-title');
+            const totalPriceEl = document.getElementById('total-price');
+            const payBtn = document.getElementById('pay-btn');
+
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+            const saveCart = () => {
+                localStorage.setItem('cart', JSON.stringify(cart));
+            };
+
+            const updateCart = (itemId, newQuantity) => {
+                const itemIndex = cart.findIndex(item => item.id === itemId);
+                if (itemIndex > -1) {
+                    if (newQuantity > 0) {
+                        cart[itemIndex].quantity = newQuantity;
+                    } else {
+                        // Remove item if quantity is 0 or less
+                        cart.splice(itemIndex, 1);
+                    }
+                    saveCart();
+                    renderCart();
+                }
+            };
+
+            const renderCart = () => {
+                // Clear current items
+                cartItemsContainer.innerHTML = '';
+
+                if (cart.length === 0) {
+                    cartItemsContainer.innerHTML = '<p class="empty-cart-message">Your cart is empty.</p>';
+                    payBtn.disabled = true;
+                } else {
+                    payBtn.disabled = false;
+                }
+
+                let total = 0;
+                cart.forEach(item => {
+                    const itemHTML = `
+                        <div class="cart-item">
+                            <button class="remove-item-btn" data-id="${item.id}">&times;</button>
+                            <img src="${item.image}" alt="${item.name}">
+                            <div class="item-details">
+                                <p class="item-name">${item.name}</p>
+                                <span class="item-meta">Price: ${item.price} ETB</span>
+                                <div class="quantity-control">
+                                    <button class="quantity-btn" data-id="${item.id}" data-change="-1">-</button>
+                                    <span class="item-quantity">${item.quantity}</span>
+                                    <button class="quantity-btn" data-id="${item.id}" data-change="1">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    cartItemsContainer.innerHTML += itemHTML;
+                    total += item.price * item.quantity;
+                });
+
+                totalPriceEl.textContent = total.toFixed(2);
+                cartTitle.textContent = `${cart.length} item${cart.length !== 1 ? 's' : ''} in Cart`;
+            };
+
+            // Event delegation for quantity and remove buttons
+            cartItemsContainer.addEventListener('click', (e) => {
+                const target = e.target;
+                const itemId = target.dataset.id;
+
+                if (!itemId) return;
+
+                // Handle remove button
+                if (target.classList.contains('remove-item-btn')) {
+                    updateCart(itemId, 0); // Setting quantity to 0 removes it
+                }
+
+                // Handle quantity buttons
+                if (target.classList.contains('quantity-btn')) {
+                    const change = parseInt(target.dataset.change);
+                    const item = cart.find(i => i.id === itemId);
+                    if (item) {
+                        updateCart(itemId, item.quantity + change);
+                    }
+                }
+            });
+
+            // Handle Pay button click
+            payBtn.addEventListener('click', () => {
+                if (cart.length > 0) {
+                    // Save the final cart to be used on the payment page
+                    localStorage.setItem('orderToPay', JSON.stringify(cart));
+                    // Redirect to the payment/checkout page
+                    window.location.href = 'payment_page.html'; // CHANGE this to your actual payment page
+                }
+            });
+
+            // Initial render
+            renderCart();
+        });
+    </script>
+</body>
+
+</html>

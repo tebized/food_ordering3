@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favorites</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap");
+
+        :root {
+            --primary-color: #2a9d8f;
+            --background-color: #f0f0f0;
+            --card-background: #e9e9e9;
+            --text-color: #333;
+            --text-light: #666;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Roboto", sans-serif;
+            background-color: var(--background-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-color);
+        }
+
+        .mobile-container {
+            width: 375px;
+            height: 812px;
+            background-color: #f8f8f8;
+            border-radius: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        .page-header h1 {
+            font-size: 22px;
+            font-weight: 500;
+        }
+
+        .back-button {
+            position: absolute;
+            left: 25px;
+            font-size: 20px;
+            color: var(--text-color);
+            text-decoration: none;
+        }
+
+        .favorites-list {
+            padding: 0 20px;
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-bottom: 90px;
+        }
+
+        .favorite-item-card {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background-color: var(--card-background);
+            border-radius: 20px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .favorite-item-card img {
+            width: 80px;
+            height: 80px;
+            border-radius: 15px;
+            object-fit: cover;
+        }
+
+        .item-details {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .item-name {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .item-meta {
+            font-size: 14px;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .item-meta .fa-star {
+            color: #f9a602;
+        }
+
+        .btn-order-now {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        /* UPDATED: Footer Styles */
+        footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #d9d9d9;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 70px;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding: 5px 0;
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: black;
+            font-size: 12px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .nav-item i {
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+
+        .nav-item.active {
+            color: #26a69a;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="mobile-container">
+        <header class="page-header">
+            <a href="profile.html" class="back-button">
+                <i class="fa-solid fa-chevron-left"></i>
+            </a>
+            <h1>Favorite</h1>
+        </header>
+
+        <main class="favorites-list" id="favorites-list">
+            <p id="loading-message">Loading your favorites...</p>
+        </main>
+
+        <!-- UPDATED: Footer with new icons -->
+        <footer>
+            <a href="customer_home.html" class="nav-item"><i class="fas fa-home"></i><span>Home</span></a>
+            <a href="buy.html" class="nav-item"><i class="fas fa-shopping-cart"></i><span>Buy</span></a>
+            <a href="customer_orders.html" class="nav-item"><i class="fas fa-shopping-bag"></i><span>My Order</span></a>
+            <a href="profile.html" class="nav-item active"><i class="fas fa-user"></i><span>Profile</span></a>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            const API_BASE_URL = 'http://127.0.0.1:8000';
+            const favoritesList = document.getElementById('favorites-list');
+            const loadingMessage = document.getElementById('loading-message');
+            const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+
+            async function fetchWithAuth(endpoint, options = {}) {
+                const token = localStorage.getItem('accessToken');
+
+                if (!token) {
+                    window.location.href = 'customer_login.html';
+                    return;
+                }
+
+                const headers = {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                    ...options.headers,
+                };
+
+                try {
+                    const response = await fetch(`${API_BASE_URL}${endpoint}`, { ...options, headers });
+
+                    if (response.status === 401) {
+                        localStorage.removeItem('accessToken');
+                        window.location.href = 'customer_login.html';
+                        throw new Error('Unauthorized');
+                    }
+
+                    if (!response.ok) {
+                        throw new Error(`API Error: ${response.status}`);
+                    }
+
+                    const contentType = response.headers.get("content-type");
+                    if (contentType && contentType.indexOf("application/json") !== -1) {
+                        return response.json();
+                    } else {
+                        return null;
+                    }
+                } catch (error) {
+                    console.error('API Request Failed:', error);
+                    if (error.message !== 'Unauthorized') {
+                        loadingMessage.textContent = 'Could not load data.';
+                    }
+                    throw error;
+                }
+            }
+
+            if (favorites.length === 0) {
+                loadingMessage.textContent = 'You have no favorite items yet.';
+            } else {
+                try {
+                    const allRestaurants = await fetchWithAuth('/api/restaurants/');
+                    if (allRestaurants) {
+                        renderFavorites(favorites, allRestaurants);
+                    }
+                } catch (error) {
+                    console.error("Failed to load restaurant data", error);
+                }
+            }
+
+            function renderFavorites(items, restaurants) {
+                favoritesList.innerHTML = '';
+                const restaurantMap = new Map(restaurants.map(r => [r.id, r.name]));
+
+                items.forEach(item => {
+                    const restaurantName = restaurantMap.get(item.restaurant) || 'Unknown';
+                    const card = document.createElement('div');
+                    card.className = 'favorite-item-card';
+                    card.innerHTML = `
+                        <img src="${item.image || 'https://placehold.co/80x80/e9e9e9/333?text=Food'}" alt="${item.name}">
+                        <div class="item-details">
+                            <p class="item-name">${item.name}</p>
+                            <span class="item-meta">🇪🇹 ${restaurantName}</span>
+                            <span class="item-meta"><i class="fa-solid fa-star"></i> ${item.average_rating ? item.average_rating.toFixed(1) : 'No ratings'}</span>
+                        </div>
+                        <button class="btn-order-now" data-item-id="${item.id}">Order now</button>
+                    `;
+                    favoritesList.appendChild(card);
+                });
+            }
+
+            favoritesList.addEventListener('click', (e) => {
+                if (e.target.classList.contains('btn-order-now')) {
+                    const itemId = e.target.dataset.itemId;
+                    if (itemId) {
+                        window.location.href = `food_detail.html?id=${itemId}`;
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

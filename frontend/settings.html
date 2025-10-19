@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setting</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap");
+
+        /* Light Mode Variables (Default) */
+        :root {
+            --primary-color: #2a9d8f;
+            --background-color: #f8f8f8;
+            --container-background: #f0f0f0;
+            --card-background: #e9e9e9;
+            --text-color: #333;
+            --text-light: #666;
+            --border-color: #dcdcdc;
+        }
+
+        /* Dark Mode Variables */
+        body.dark-mode {
+            --background-color: #121212;
+            --container-background: #1e1e1e;
+            --card-background: #2a2a2a;
+            --text-color: #f5f5f5;
+            --text-light: #999;
+            --border-color: #444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Roboto", sans-serif;
+            background-color: var(--container-background);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .mobile-container {
+            width: 375px;
+            height: 812px;
+            background-color: var(--background-color);
+            border-radius: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Page Header */
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        .page-header h1 {
+            font-size: 22px;
+            font-weight: 500;
+        }
+
+        .back-button {
+            position: absolute;
+            left: 25px;
+            font-size: 20px;
+            color: var(--text-color);
+            text-decoration: none;
+        }
+
+        /* Settings List */
+        .setting-content {
+            padding: 0 20px;
+        }
+
+        .setting-group {
+            background-color: var(--card-background);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .setting-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 20px;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        /* Toggle Switch Styles */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 28px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+            border-radius: 28px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background-color: var(--primary-color);
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(22px);
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            background-color: var(--card-background);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            border-radius: 30px 30px 0 0;
+            margin: 0 20px;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #888;
+        }
+
+        .nav-item i {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+
+        .nav-item span {
+            font-size: 12px;
+        }
+
+        .nav-item.active {
+            color: var(--text-color);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="mobile-container">
+        <header class="page-header">
+            <a href="profile.html" class="back-button">
+                <i class="fa-solid fa-chevron-left"></i>
+            </a>
+            <h1>Setting</h1>
+        </header>
+
+        <main class="setting-content">
+            <div class="setting-group">
+                <div class="setting-item">
+                    <span>Dark mode</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="dark-mode-toggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </main>
+
+        <nav class="bottom-nav">
+            <a href="customer_home.html" class="nav-item">
+                <i class="fa-solid fa-house"></i>
+                <span>Home</span>
+            </a>
+            <a href="customer_checkout.html" class="nav-item">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span>Buy</span>
+            </a>
+            <a href="customer_orders.html" class="nav-item">
+                <i class="fa-solid fa-bag-shopping"></i>
+                <span>My Order</span>
+            </a>
+            <a href="profile.html" class="nav-item active">
+                <i class="fa-solid fa-user"></i>
+                <span>Profile</span>
+            </a>
+        </nav>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const darkModeToggle = document.getElementById("dark-mode-toggle");
+            const body = document.body;
+
+            const applyTheme = () => {
+                const savedTheme = localStorage.getItem("theme");
+                if (savedTheme === "dark") {
+                    body.classList.add("dark-mode");
+                    darkModeToggle.checked = true;
+                } else {
+                    body.classList.remove("dark-mode");
+                    darkModeToggle.checked = false;
+                }
+            };
+
+            darkModeToggle.addEventListener("change", () => {
+                if (darkModeToggle.checked) {
+                    body.classList.add("dark-mode");
+                    localStorage.setItem("theme", "dark");
+                } else {
+                    body.classList.remove("dark-mode");
+                    localStorage.setItem("theme", "light");
+                }
+            });
+
+            applyTheme();
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Delivery App</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* General Body Styles */
+        body {
+            font-family: "Inter", sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #a0aec0;
+            /* gray-400 */
+            margin: 0;
+        }
+
+        /* Mobile Screen Container */
+        .mobile-screen {
+            max-width: 375px;
+            width: 100%;
+            height: 812px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            background-color: white;
+            border-radius: 24px;
+            padding: 16px;
+            padding-bottom: 0px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        .food-description {
+            background-color: #d9d9d9;
+            border-radius: 10px;
+            padding: 8px;
+        }
+
+        .profile-section {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        /* Logo style */
+        .logo-image {
+            width: 48px;
+            height: 48px;
+            border-radius: 9999px;
+            object-fit: cover;
+        }
+
+        .welcome-text {
+            text-align: right;
+        }
+
+        .welcome-text p {
+            margin: 0;
+            color: #4b5563;
+            /* gray-600 */
+            font-size: 14px;
+        }
+
+        .welcome-text .username {
+            font-weight: 600;
+            color: #2d9b91;
+        }
+
+        .profile-icon-wrapper {
+            width: 48px;
+            height: 48px;
+            background-color: #d1d5db;
+            /* gray-300 */
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            /* gray-500 */
+        }
+
+        /* Search Bar */
+        .search-container {
+            position: relative;
+            margin-bottom: 24px;
+        }
+
+        .search-input {
+            width: 100%;
+            background-color: white;
+            border-radius: 12px;
+            padding: 12px 16px 12px 40px;
+            color: #374151;
+            /* gray-700 */
+            border: 1px solid #e5e7eb;
+            box-sizing: border-box;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #14b8a6;
+            box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.5);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            /* gray-400 */
+        }
+
+        /* Filter Buttons */
+        .filter-buttons {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .filter-buttons a {
+            flex: 1;
+            text-decoration: none;
+        }
+
+        .filter-button {
+            flex: 1;
+            font-weight: 600;
+            padding: 12px 0;
+            border-radius: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.1s ease;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .filter-button:active {
+            transform: scale(0.95);
+        }
+
+        .filter-button.active {
+            background-color: #19b6a5;
+            color: white;
+        }
+
+        .filter-button:not(.active) {
+            background-color: white;
+            color: #4b5563;
+            /* gray-600 */
+        }
+
+        /* Main Content */
+        .main-content {
+            background-color: #f3f4f6;
+            border-top-left-radius: 24px;
+            border-top-right-radius: 24px;
+            padding: 16px;
+            flex-grow: 1;
+            overflow-y: auto;
+            /* Make content scrollable */
+            margin: 0 -16px;
+            /* Extend to edges */
+            padding-bottom: 90px;
+        }
+
+        .food-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        /* Food Card */
+        .food-card {
+            background-color: #f3f4f6;
+            border-radius: 16px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+                0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .food-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .food-image-container {
+            position: relative;
+        }
+
+        .food-image {
+            width: 100%;
+            height: 96px;
+            object-fit: cover;
+            border-radius: 12px;
+        }
+
+        .price-tag {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            background-color: #2d9b91;
+            color: white;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 9999px;
+        }
+
+        .food-name {
+            font-weight: 700;
+            color: #1f2937;
+            /* gray-800 */
+            margin-top: 8px;
+            margin-bottom: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .restaurant-info {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            color: #717479;
+            /* gray-500 */
+            margin-top: 4px;
+        }
+
+        .flag {
+            font-size: 12px;
+            margin-right: 4px;
+        }
+
+        .rating {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            color: #f59e0b;
+            /* yellow-500 */
+            margin-top: 4px;
+        }
+
+        .rating-value {
+            margin-left: 4px;
+            color: #4b5563;
+            /* gray-600 */
+            font-weight: 600;
+        }
+
+        /* UPDATED: Footer Styles */
+        footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #d9d9d9;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 70px;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding: 5px 0;
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: black;
+            font-size: 12px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .nav-item i {
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+
+        .nav-item.active {
+            color: #26a69a;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="mobile-screen">
+
+        <header class="header">
+            <img src="images/DimScreen_(1)_xNOPPUxEvV.png" alt="App Logo" class="logo-image">
+
+            <div class="profile-section">
+                <div class="welcome-text">
+                    <p>Welcome</p>
+                    <p class="username" id="username-display">@user</p>
+                </div>
+                <a href="profile.html">
+                    <div class="profile-icon-wrapper">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                            <circle cx="12" cy="7" r="4" />
+                        </svg>
+                    </div>
+                </a>
+            </div>
+        </header>
+
+        <div class="search-container">
+            <input type="text" placeholder="Search for food" class="search-input" id="search-input">
+            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.3-4.3" />
+            </svg>
+        </div>
+
+        <div class="filter-buttons">
+            <a href="#"><button class="filter-button active">Food</button></a>
+            <a href="customer_dashboard.html"><button class="filter-button">Restaurant</button></a>
+        </div>
+
+        <main class="main-content">
+            <div class="food-grid" id="food-grid">
+                <p id="loading-message">Loading delicious food...</p>
+            </div>
+        </main>
+
+        <!-- UPDATED: Footer with new icons -->
+        <footer>
+            <a href="customer_home.html" class="nav-item active"><i class="fas fa-home"></i><span>Home</span></a>
+            <a href="#" onclick="checkAuthAndRedirect('buy.html')" class="nav-item"><i class="fas fa-shopping-cart"></i><span>Buy</span></a>
+            <a href="#" onclick="checkAuthAndRedirect('customer_orders.html')" class="nav-item"><i class="fas fa-shopping-bag"></i><span>My Order</span></a>
+            <a href="#" onclick="checkAuthAndRedirect('profile.html')" class="nav-item"><i class="fas fa-user"></i><span>Profile</span></a>
+        </footer>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://127.0.0.1:8000'; // Base URL for the entire API
+        let allMenuItems = [];
+        let allRestaurants = {};
+
+        const usernameDisplay = document.getElementById('username-display');
+        const foodGrid = document.getElementById('food-grid');
+        const searchInput = document.getElementById('search-input');
+        const loadingMessage = document.getElementById('loading-message');
+
+        async function fetchWithAuth(endpoint, options = {}) {
+            const token = localStorage.getItem('accessToken');
+
+            if (!token) {
+                window.location.href = 'customer_login.html';
+                return;
+            }
+
+            const headers = {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+                ...options.headers,
+            };
+
+            const response = await fetch(`${API_BASE_URL}${endpoint}`, { ...options, headers });
+
+            if (response.status === 401) {
+                localStorage.removeItem('accessToken');
+                window.location.href = 'customer_login.html';
+                throw new Error('Unauthorized');
+            }
+
+            if (!response.ok) {
+                throw new Error(`API Error: ${response.status}`);
+            }
+
+            return response.json();
+        }
+
+        // New function for guest browsing (no authentication required)
+        async function fetchPublic(endpoint, options = {}) {
+            const headers = {
+                'Content-Type': 'application/json',
+                ...options.headers,
+            };
+
+            const response = await fetch(`${API_BASE_URL}${endpoint}`, { ...options, headers });
+
+            if (!response.ok) {
+                throw new Error(`API Error: ${response.status}`);
+            }
+
+            return response.json();
+        }
+
+        async function fetchInitialData() {
+            try {
+                // Check if user is logged in
+                const token = localStorage.getItem('accessToken');
+                let user = null;
+                
+                if (token) {
+                    try {
+                        user = await fetchWithAuth('/api/profile/');
+                        if (user && user.username) {
+                            usernameDisplay.textContent = `@${user.username}`;
+                        }
+                    } catch (error) {
+                        // Token is invalid, clear it and continue as guest
+                        localStorage.removeItem('accessToken');
+                        usernameDisplay.textContent = 'Guest';
+                    }
+                } else {
+                    usernameDisplay.textContent = 'Guest';
+                }
+
+                // Fetch public data (no authentication required)
+                const [menuItems, restaurants] = await Promise.all([
+                    fetchPublic('/api/menu-items/'),
+                    fetchPublic('/api/restaurants/')
+                ]);
+
+                restaurants.forEach(r => { allRestaurants[r.id] = r.name; });
+
+                allMenuItems = menuItems;
+                renderFoodCards(allMenuItems);
+
+            } catch (error) {
+                console.error("Failed to fetch initial data:", error);
+                loadingMessage.textContent = 'Could not load data. Please try again.';
+                loadingMessage.classList.add('text-red-500');
+            }
+        }
+
+        function renderFoodCards(itemsToRender) {
+            foodGrid.innerHTML = '';
+            if (!itemsToRender || itemsToRender.length === 0) {
+                foodGrid.innerHTML = '<p>No food items found.</p>';
+                return;
+            }
+
+            itemsToRender.forEach(item => {
+                const restaurantName = allRestaurants[item.restaurant] || 'Unknown Restaurant';
+                const card = document.createElement('div');
+                card.className = 'food-card';
+                card.dataset.itemId = item.id;
+
+                card.innerHTML = `
+                    <div class="food-image-container">
+                        <img src="${item.image || 'https://placehold.co/300x200/E2E8F0/A0AEC0?text=No+Image'}" alt="${item.name}" class="food-image">
+                        <div class="price-tag">${item.price} ETB</div>
+                    </div>
+                    <div class="food-description">
+                        <h3 class="food-name">${item.name}</h3>
+                        <div class="restaurant-info">
+                            <span class="flag">🇪🇹</span>
+                            <span>${restaurantName}</span>
+                        </div>
+                        <div class="rating">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                            </svg>
+                            <span class="rating-value">${item.average_rating ? item.average_rating.toFixed(1) : 'No ratings'}</span>
+                        </div>
+                    </div>
+                `;
+                foodGrid.appendChild(card);
+            });
+        }
+
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const filteredItems = allMenuItems.filter(item => {
+                const restaurantName = allRestaurants[item.restaurant] || '';
+                return item.name.toLowerCase().includes(searchTerm) || restaurantName.toLowerCase().includes(searchTerm);
+            });
+            renderFoodCards(filteredItems);
+        });
+
+        foodGrid.addEventListener('click', (e) => {
+            const card = e.target.closest('.food-card');
+            if (card) {
+                const itemId = card.dataset.itemId;
+                if (itemId) {
+                    window.location.href = `food_detail.html?id=${itemId}`;
+                }
+            }
+        });
+
+        // Function to check authentication and redirect
+        function checkAuthAndRedirect(page) {
+            const token = localStorage.getItem('accessToken');
+            if (!token) {
+                if (confirm('You need to sign in to access this page. Would you like to sign in now?')) {
+                    window.location.href = 'customer_login.html';
+                }
+            } else {
+                window.location.href = page;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchInitialData);
+    </script>
+</body>
+
+</html>

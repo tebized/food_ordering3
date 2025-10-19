@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Delivery App - Buy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: "Inter", sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #a0aec0;
+            margin: 0;
+        }
+
+        .mobile-container {
+            max-width: 375px;
+            width: 100%;
+            height: 812px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            background-color: #FFFFFF;
+            border-radius: 24px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        .page-title {
+            font-size: 20px;
+            font-weight: 600;
+            text-align: center;
+            color: #1f2937;
+            margin-top: 16px;
+            margin-bottom: 24px;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .filter-buttons a {
+            flex: 1;
+            text-decoration: none;
+        }
+
+        .filter-button {
+            flex: 1;
+            font-weight: 600;
+            padding: 12px 0;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.1s ease;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .filter-button.active {
+            background-color: #2d9b91;
+            color: white;
+        }
+
+        .filter-button:not(.active) {
+            background-color: #F3F4F6;
+            color: #4b5563;
+        }
+
+        .main-content {
+            background-color: white;
+            border-radius: 24px;
+            padding: 0;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            padding-bottom: 100px;
+        }
+
+        .list-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1f2937;
+            margin-top: 0;
+            margin-bottom: 24px;
+        }
+
+        .food-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .food-item {
+            display: flex;
+            align-items: center;
+            background-color: #f3f4f6;
+            border-radius: 12px;
+            padding: 12px;
+            gap: 12px;
+        }
+
+        .food-image {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .food-details {
+            flex-grow: 1;
+        }
+
+        .food-details p {
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .food-name {
+            font-weight: 600;
+            font-size: 16px;
+            color: #111827;
+        }
+
+        .food-restaurant,
+        .food-rating {
+            font-size: 14px;
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .flag-icon {
+            width: 16px;
+            height: 16px;
+        }
+
+        .order-button {
+            background-color: #2d9b91;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .order-button:hover {
+            background-color: #258178;
+        }
+
+        footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #d9d9d9;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 70px;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding: 5px 0;
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: black;
+            font-size: 12px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .nav-item i {
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+
+        .nav-item.active {
+            color: #26a69a;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="mobile-container">
+        <h1 class="page-title">Buy</h1>
+        <div class="filter-buttons">
+            <a href="#"><button class="filter-button active">Food</button></a>
+            <a href="buy2.html"> <button class="filter-button">Restaurant</button></a>
+        </div>
+
+        <main class="main-content">
+            <div class="food-list-container">
+                <h2 class="list-title">Popular Food Items</h2>
+                <div class="food-list" id="food-list">
+                    <p id="loading-message">Loading food items...</p>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <a href="customer_home.html" class="nav-item"><i class="fas fa-home"></i><span>Home</span></a>
+            <a href="buy.html" class="nav-item active"><i class="fas fa-shopping-cart"></i><span>Buy</span></a>
+            <a href="customer_orders.html" class="nav-item"><i class="fas fa-shopping-bag"></i><span>My Order</span></a>
+            <a href="profile.html" class="nav-item"><i class="fas fa-user"></i><span>Profile</span></a>
+        </footer>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://127.0.0.1:8000';
+        let allMenuItems = [];
+        let allRestaurants = {};
+
+        const foodList = document.getElementById('food-list');
+        const loadingMessage = document.getElementById('loading-message');
+
+        async function fetchWithAuth(endpoint, options = {}) {
+            const token = localStorage.getItem('accessToken');
+
+            if (!token) {
+                window.location.href = 'customer_login.html';
+                return;
+            }
+
+            const headers = {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+                ...options.headers,
+            };
+
+            const response = await fetch(`${API_BASE_URL}${endpoint}`, { ...options, headers });
+
+            if (response.status === 401) {
+                localStorage.removeItem('accessToken');
+                window.location.href = 'customer_login.html';
+                throw new Error('Unauthorized');
+            }
+
+            if (!response.ok) {
+                throw new Error(`API Error: ${response.status}`);
+            }
+
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.indexOf("application/json") !== -1) {
+                return response.json();
+            } else {
+                return null;
+            }
+        }
+
+        async function fetchInitialData() {
+            try {
+                // First verify user role
+                const userProfile = await fetchWithAuth('/api/profile/');
+                
+                // Role-based access control: Only customers can access this page
+                if (userProfile.role !== 'customer') {
+                    localStorage.removeItem('accessToken');
+                    alert('Access Denied: You do not have permission to access this page.');
+                    window.location.href = 'customer_login.html';
+                    return;
+                }
+                
+                const [menuItems, restaurants] = await Promise.all([
+                    fetchWithAuth('/api/menu-items/'),
+                    fetchWithAuth('/api/restaurants/')
+                ]);
+
+                restaurants.forEach(r => { allRestaurants[r.id] = r.name; });
+                allMenuItems = menuItems;
+                renderFoodList(allMenuItems);
+
+            } catch (error) {
+                console.error("Failed to load data:", error);
+                if (error.message !== 'Unauthorized') {
+                    loadingMessage.textContent = 'Could not load food items. Please try again.';
+                    loadingMessage.classList.add('text-red-500');
+                }
+            }
+        }
+
+        function renderFoodList(items) {
+            foodList.innerHTML = '';
+            if (!items || items.length === 0) {
+                foodList.innerHTML = '<p>No food items available.</p>';
+                return;
+            }
+            items.forEach(item => {
+                const restaurantName = allRestaurants[item.restaurant] || 'Unknown';
+                const itemEl = document.createElement('div');
+                itemEl.className = 'food-item';
+                itemEl.innerHTML = `
+                    <img src="${item.image || 'https://placehold.co/128/E2E8F0/A0AEC0?text=Food'}" alt="${item.name}" class="food-image">
+                    <div class="food-details">
+                        <p class="food-name">${item.name}</p>
+                        <p class="food-restaurant">
+                            <img src="https://i.ibb.co/L8d5fLd/ethiopia-flag-small.png" alt="Ethiopia flag" class="flag-icon">
+                            ${restaurantName}
+                        </p>
+                        <p class="food-rating">
+                            <i class="fas fa-star" style="color: #FFC107;"></i>
+                            ${item.average_rating ? item.average_rating.toFixed(1) : 'No ratings'}
+                        </p>
+                    </div>
+                    <button class="order-button" data-item-id="${item.id}">Order now</button>
+                `;
+                foodList.appendChild(itemEl);
+            });
+        }
+
+        foodList.addEventListener('click', (e) => {
+            if (e.target.classList.contains('order-button')) {
+                const itemId = e.target.dataset.itemId;
+                if (itemId) {
+                    window.location.href = `food_detail.html?id=${itemId}`;
+                }
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', fetchInitialData);
+    </script>
+</body>
+
+</html>

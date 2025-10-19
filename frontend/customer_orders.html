@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .mobile-container {
+            max-width: 390px;
+            width: 100%;
+            height: 100vh;
+            min-height: 844px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 3xl;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .mobile-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 200px;
+            background: linear-gradient(135deg, #2a9d8f 0%, #1e7a6b 100%);
+            z-index: 0;
+        }
+
+        .order-card {
+            color: #333;
+            padding: 1.5rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-decoration: none;
+            display: block;
+            transition: all 0.3s ease;
+            background: white;
+            border: 1px solid #e9ecef;
+            margin-bottom: 1rem;
+        }
+
+        .order-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .order-card.in-progress {
+            border-left: 4px solid #ff6b6b;
+            background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%);
+        }
+
+        .order-card.pending {
+            border-left: 4px solid #feca57;
+            background: linear-gradient(135deg, #fffbf0 0%, #ffffff 100%);
+        }
+
+        .order-card.completed {
+            border-left: 4px solid #48dbfb;
+            background: linear-gradient(135deg, #f0fdff 0%, #ffffff 100%);
+        }
+
+        footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #d9d9d9;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 70px;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding: 5px 0;
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: black;
+            font-size: 12px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .nav-item i {
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+
+        .nav-item.active {
+            color: #ffffff;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding: 15px 20px;
+            background: white;
+            border-radius: 15px;
+            border: 1px solid #e9ecef;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .section-header h2 {
+            color: #2a9d8f;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .section-header i {
+            color: #2a9d8f;
+            font-size: 1.1rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+            font-size: 1.1rem;
+            background: white;
+            border-radius: 15px;
+            border: 1px solid #e9ecef;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #dee2e6;
+        }
+
+        .main-content {
+            position: relative;
+            z-index: 1;
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .header {
+            position: relative;
+            z-index: 2;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+
+<body class="flex justify-center">
+    <div class="mobile-container w-full h-full bg-white rounded-3xl shadow-lg overflow-hidden flex flex-col">
+
+        <!-- Header -->
+        <header class="header p-4 flex items-center sticky top-0 z-10">
+            <a href="customer_home.html" class="text-xl text-white mr-4 hover:text-yellow-300 transition-colors"><i class="fas fa-arrow-left"></i></a>
+            <h1 class="text-xl font-bold text-white">My Orders</h1>
+        </header>
+
+        <!-- Orders List -->
+        <main class="main-content space-y-6">
+
+            <!-- Pending Approval Section -->
+            <div>
+                <div class="section-header">
+                    <i class="fas fa-hourglass-half"></i>
+                    <h2>Pending Approval</h2>
+                </div>
+                <div id="pending-orders" class="space-y-3">
+                    <div class="empty-state">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Loading pending orders...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- In Progress Section -->
+            <div>
+                <div class="section-header">
+                    <i class="fas fa-person-running"></i>
+                    <h2>In Progress</h2>
+                </div>
+                <div id="in-progress-orders" class="space-y-3">
+                    <!-- Placeholder -->
+                </div>
+            </div>
+
+            <!-- Delivered Section -->
+            <div>
+                <div class="section-header">
+                    <i class="fas fa-truck"></i>
+                    <h2>Delivered</h2>
+                </div>
+                <div id="delivered-orders" class="space-y-3">
+                    <!-- Placeholder -->
+                </div>
+            </div>
+
+            <!-- Completed Section -->
+            <div>
+                <div class="section-header">
+                    <i class="fas fa-check-circle"></i>
+                    <h2>Completed</h2>
+                </div>
+                <div id="completed-orders" class="space-y-3">
+                    <!-- Placeholder -->
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Bottom Navigation -->
+        <footer>
+            <a href="customer_home.html" class="nav-item"><i class="fas fa-home"></i><span>Home</span></a>
+            <a href="buy.html" class="nav-item"><i class="fas fa-shopping-cart"></i><span>Buy</span></a>
+            <a href="customer_orders.html" class="nav-item active"><i
+                    class="fas fa-shopping-bag"></i><span>Order</span></a>
+            <a href="profile.html" class="nav-item"><i class="fas fa-user"></i><span>Profile</span></a>
+        </footer>
+    </div>
+
+    <script>
+        // Global API base URL
+        const API_BASE_URL = 'http://127.0.0.1:8000';
+        
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const inProgressContainer = document.getElementById('in-progress-orders');
+            const pendingContainer = document.getElementById('pending-orders');
+            const deliveredContainer = document.getElementById('delivered-orders');
+            const completedContainer = document.getElementById('completed-orders');
+
+            async function fetchWithAuth(endpoint, options = {}) {
+                const token = localStorage.getItem('accessToken');
+
+                if (!token) {
+                    window.location.href = 'customer_login.html';
+                    return;
+                }
+
+                const headers = {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                    ...options.headers,
+                };
+
+                const response = await fetch(`${API_BASE_URL}${endpoint}`, { ...options, headers });
+
+                if (response.status === 401) {
+                    localStorage.removeItem('accessToken');
+                    window.location.href = 'customer_login.html';
+                    throw new Error('Unauthorized');
+                }
+
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status}`);
+                }
+
+                const contentType = response.headers.get("content-type");
+                if (contentType && contentType.indexOf("application/json") !== -1) {
+                    return response.json();
+                } else {
+                    return null;
+                }
+            }
+
+            const createOrderCard = (order) => {
+                const card = document.createElement('div');
+                let cardClass = 'order-card';
+                let statusIcon = 'fas fa-clock';
+                let statusPage = 'under_review.html'; // Default redirect
+
+                if (order.status === 'Pending Approval') {
+                    cardClass += ' pending';
+                    statusIcon = 'fas fa-hourglass-half';
+                    statusPage = 'under_review.html';
+                } else if (order.status === 'Preparing') {
+                    cardClass += ' in-progress';
+                    statusIcon = 'fas fa-utensils';
+                    statusPage = 'under_review.html';
+                } else if (order.status === 'Ready for Pickup') {
+                    cardClass += ' in-progress';
+                    statusIcon = 'fas fa-shipping-fast';
+                    statusPage = 'under_review.html';
+                } else if (order.status === 'Delivered') {
+                    cardClass += ' completed';
+                    statusIcon = 'fas fa-truck';
+                    statusPage = 'under_review.html';
+                } else if (order.status === 'Completed') {
+                    cardClass += ' completed';
+                    statusIcon = 'fas fa-check-circle';
+                    statusPage = 'under_review.html';
+                }
+
+                card.className = cardClass;
+                
+                // Create the main card content with enhanced design
+                let cardContent = `
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex items-center gap-3">
+                            <i class="${statusIcon} text-2xl"></i>
+                            <div>
+                                <span class="font-bold text-xl">#${order.order_code}</span>
+                                <p class="text-sm opacity-90 mt-1">${order.status}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="font-bold text-xl">${parseFloat(order.total_price).toFixed(2)} Birr</span>
+                            <p class="text-sm opacity-90">Total</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between items-center text-sm opacity-90">
+                        <span><i class="fas fa-calendar mr-1"></i>${new Date(order.created_at).toLocaleDateString()}</span>
+                        <span><i class="fas fa-store mr-1"></i>${order.restaurant_details ? order.restaurant_details.name : 'Restaurant'}</span>
+                    </div>
+                `;
+
+                // Add "Mark as Delivered" button for Preparing and Ready for Pickup orders
+                if (order.status === 'Preparing' || order.status === 'Ready for Pickup') {
+                    cardContent += `
+                        <div class="mt-3">
+                            <button onclick="markAsDelivered(${order.id})" class="w-full bg-white text-blue-500 font-bold py-2 px-4 rounded-lg hover:bg-gray-100 transition-colors">
+                                <i class="fas fa-check-circle mr-2"></i>Delivered
+                            </button>
+                        </div>
+                    `;
+                }
+
+                // Add rating button for Delivered orders
+                if (order.status === 'Delivered') {
+                    cardContent += `
+                        <div class="mt-3">
+                            <button onclick="showRatingModal(${order.id})" class="w-full bg-white text-purple-500 font-bold py-2 px-4 rounded-lg hover:bg-gray-100 transition-colors">
+                                <i class="fas fa-star mr-2"></i>Rate Your Order
+                            </button>
+                        </div>
+                    `;
+                }
+
+                card.innerHTML = cardContent;
+
+                // Add click handler for navigation (except for buttons)
+                card.addEventListener('click', (e) => {
+                    if (!e.target.closest('button')) {
+                        sessionStorage.setItem('lastOrder', JSON.stringify(order));
+                        window.location.href = statusPage;
+                    }
+                });
+
+                return card;
+            };
+
+            const fetchOrders = async () => {
+                try {
+                    // First verify user role
+                    const userProfile = await fetchWithAuth('/api/profile/');
+                    
+                    // Role-based access control: Only customers can access this page
+                    if (userProfile.role !== 'customer') {
+                        localStorage.removeItem('accessToken');
+                        alert('Access Denied: You do not have permission to access this page.');
+                        window.location.href = 'customer_login.html';
+                        return;
+                    }
+                    
+                    const orders = await fetchWithAuth('/api/orders/');
+
+                    pendingContainer.innerHTML = '';
+                    inProgressContainer.innerHTML = '';
+                    deliveredContainer.innerHTML = '';
+                    completedContainer.innerHTML = '';
+
+                    const pendingOrders = orders.filter(o => o.status === 'Pending Approval');
+                    const inProgressOrders = orders.filter(o => o.status === 'Preparing' || o.status === 'Ready for Pickup');
+                    const deliveredOrders = orders.filter(o => o.status === 'Delivered');
+                    const completedOrders = orders.filter(o => o.status === 'Completed');
+
+                    if (pendingOrders.length > 0) {
+                        pendingOrders.forEach(order => pendingContainer.appendChild(createOrderCard(order)));
+                    } else {
+                        pendingContainer.innerHTML = `
+                            <div class="empty-state">
+                                <i class="fas fa-hourglass-half"></i>
+                                <p>No orders are pending approval</p>
+                            </div>
+                        `;
+                    }
+
+                    if (inProgressOrders.length > 0) {
+                        inProgressOrders.forEach(order => inProgressContainer.appendChild(createOrderCard(order)));
+                    } else {
+                        inProgressContainer.innerHTML = `
+                            <div class="empty-state">
+                                <i class="fas fa-utensils"></i>
+                                <p>No orders are on the way</p>
+                            </div>
+                        `;
+                    }
+
+                    if (deliveredOrders.length > 0) {
+                        deliveredOrders.forEach(order => deliveredContainer.appendChild(createOrderCard(order)));
+                    } else {
+                        deliveredContainer.innerHTML = `
+                            <div class="empty-state">
+                                <i class="fas fa-truck"></i>
+                                <p>No delivered orders yet</p>
+                            </div>
+                        `;
+                    }
+
+                    if (completedOrders.length > 0) {
+                        completedOrders.forEach(order => completedContainer.appendChild(createOrderCard(order)));
+                    } else {
+                        completedContainer.innerHTML = `
+                            <div class="empty-state">
+                                <i class="fas fa-check-circle"></i>
+                                <p>No completed orders yet</p>
+                            </div>
+                        `;
+                    }
+
+                } catch (error) {
+                    console.error('Error fetching orders:', error);
+                    if (error.message !== 'Unauthorized') {
+                        pendingContainer.innerHTML = `
+                            <div class="empty-state">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <p>Could not load orders</p>
+                            </div>
+                        `;
+                        inProgressContainer.innerHTML = `
+                            <div class="empty-state">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <p>Could not load orders</p>
+                            </div>
+                        `;
+                        deliveredContainer.innerHTML = `
+                            <div class="empty-state">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <p>Could not load orders</p>
+                            </div>
+                        `;
+                        completedContainer.innerHTML = `
+                            <div class="empty-state">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <p>Could not load orders</p>
+                            </div>
+                        `;
+                    }
+                }
+            };
+
+            fetchOrders();
+        });
+
+        // Global functions for order actions
+        async function markAsDelivered(orderId) {
+            try {
+                console.log('Marking order as delivered:', orderId);
+                
+                const token = localStorage.getItem('accessToken');
+                if (!token) {
+                    alert('Please log in again.');
+                    window.location.href = 'customer_login.html';
+                    return;
+                }
+
+                const response = await fetch(`${API_BASE_URL}/api/orders/${orderId}/mark_as_delivered/`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                console.log('Response status:', response.status);
+                console.log('Response ok:', response.ok);
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Error response:', errorText);
+                    let errorMessage = 'Failed to mark order as delivered';
+                    
+                    try {
+                        const errorData = JSON.parse(errorText);
+                        errorMessage = errorData.error || errorData.detail || errorMessage;
+                    } catch (e) {
+                        errorMessage = errorText || errorMessage;
+                    }
+                    
+                    throw new Error(errorMessage);
+                }
+
+                const result = await response.json();
+                console.log('Success response:', result);
+
+                // Show success message
+                alert('Order marked as delivered! You can now rate your order.');
+                
+                // Refresh the orders list
+                location.reload();
+            } catch (error) {
+                console.error('Error marking order as delivered:', error);
+                alert(`Could not mark order as delivered: ${error.message}`);
+            }
+        }
+
+        function showRatingModal(orderId) {
+            // Store the order ID for rating
+            sessionStorage.setItem('ratingOrderId', orderId);
+            
+            // Create and show rating modal
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+                    <h3 class="text-xl font-bold mb-4 text-center">Rate Your Order</h3>
+                    <div class="text-center mb-4">
+                        <div class="flex justify-center space-x-2 mb-4" id="star-rating">
+                            <i class="fas fa-star text-gray-300 text-2xl cursor-pointer hover:text-yellow-400" data-rating="1"></i>
+                            <i class="fas fa-star text-gray-300 text-2xl cursor-pointer hover:text-yellow-400" data-rating="2"></i>
+                            <i class="fas fa-star text-gray-300 text-2xl cursor-pointer hover:text-yellow-400" data-rating="3"></i>
+                            <i class="fas fa-star text-gray-300 text-2xl cursor-pointer hover:text-yellow-400" data-rating="4"></i>
+                            <i class="fas fa-star text-gray-300 text-2xl cursor-pointer hover:text-yellow-400" data-rating="5"></i>
+                        </div>
+                        <p class="text-sm text-gray-600" id="rating-text">Tap a star to rate</p>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Comment (optional)</label>
+                        <textarea id="rating-comment" class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent" rows="3" placeholder="Tell us about your experience..."></textarea>
+                    </div>
+                    <div class="flex space-x-3">
+                        <button onclick="closeRatingModal()" class="flex-1 bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 transition-colors">Cancel</button>
+                        <button onclick="submitRating()" class="flex-1 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors">Submit Rating</button>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+
+            // Add star rating functionality
+            const stars = modal.querySelectorAll('#star-rating i');
+            let selectedRating = 0;
+
+            stars.forEach((star, index) => {
+                star.addEventListener('click', () => {
+                    selectedRating = index + 1;
+                    updateStarDisplay(stars, selectedRating);
+                    updateRatingText(selectedRating);
+                });
+
+                star.addEventListener('mouseenter', () => {
+                    updateStarDisplay(stars, index + 1);
+                });
+            });
+
+            modal.querySelector('#star-rating').addEventListener('mouseleave', () => {
+                updateStarDisplay(stars, selectedRating);
+            });
+
+            function updateStarDisplay(stars, rating) {
+                stars.forEach((star, index) => {
+                    if (index < rating) {
+                        star.className = 'fas fa-star text-yellow-400 text-2xl cursor-pointer';
+                    } else {
+                        star.className = 'fas fa-star text-gray-300 text-2xl cursor-pointer hover:text-yellow-400';
+                    }
+                });
+            }
+
+            function updateRatingText(rating) {
+                const texts = ['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
+                modal.querySelector('#rating-text').textContent = texts[rating] || 'Tap a star to rate';
+            }
+        }
+
+        function closeRatingModal() {
+            const modal = document.querySelector('.fixed.inset-0');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        async function submitRating() {
+            const orderId = sessionStorage.getItem('ratingOrderId');
+            const stars = document.querySelectorAll('#star-rating i');
+            const comment = document.getElementById('rating-comment').value;
+            
+            let selectedRating = 0;
+            stars.forEach((star, index) => {
+                if (star.className.includes('text-yellow-400')) {
+                    selectedRating = Math.max(selectedRating, index + 1);
+                }
+            });
+
+            if (selectedRating === 0) {
+                alert('Please select a rating before submitting.');
+                return;
+            }
+
+            try {
+                console.log('Submitting rating for order:', orderId);
+                console.log('Selected rating:', selectedRating);
+                console.log('Comment:', comment);
+                
+                // Check if user is authenticated
+                const accessToken = localStorage.getItem('accessToken');
+                if (!accessToken) {
+                    alert('Please log in again to submit your rating.');
+                    window.location.href = 'customer_login.html';
+                    return;
+                }
+                
+                // Get order details to find menu items
+                const orderResponse = await fetch(`${API_BASE_URL}/api/orders/${orderId}/`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                    }
+                });
+
+                if (!orderResponse.ok) {
+                    throw new Error('Failed to fetch order details');
+                }
+
+                const order = await orderResponse.json();
+                console.log('=== ORDER DATA DEBUG ===');
+                console.log('Full order object:', order);
+                console.log('Order keys:', Object.keys(order));
+                console.log('Order items (order_items):', order.order_items);
+                console.log('Order items (items):', order.items);
+                console.log('Order items type:', typeof order.order_items);
+                console.log('Order items is array:', Array.isArray(order.order_items));
+                console.log('========================');
+                
+                // Handle both 'order_items' (from list view) and 'items' (from detail view)
+                const orderItems = order.order_items || order.items;
+                
+                // Check if order items exists and is an array
+                if (!orderItems || !Array.isArray(orderItems)) {
+                    console.error('Order items not found or not an array:', orderItems);
+                    console.error('Available fields:', Object.keys(order));
+                    alert('Order items not found. Cannot submit rating.');
+                    return;
+                }
+                
+                // Create ratings for each menu item in the order
+                const menuItems = orderItems.filter(item => item.menu_item);
+                
+                if (menuItems.length === 0) {
+                    alert('No menu items found in this order to rate.');
+                    return;
+                }
+
+                const ratingPromises = menuItems.map(item => {
+                    const ratingData = {
+                        menu_item: item.menu_item,
+                        stars: selectedRating,
+                        comment: comment
+                    };
+                    console.log('Submitting rating for item:', item.menu_item, 'Data:', ratingData);
+                    
+                    return fetch(`${API_BASE_URL}/api/ratings/`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(ratingData)
+                    }).then(response => {
+                        console.log(`=== RATING API RESPONSE ===`);
+                        console.log(`Item: ${item.menu_item}`);
+                        console.log(`Status: ${response.status}`);
+                        console.log(`OK: ${response.ok}`);
+                        console.log(`Headers:`, response.headers);
+                        console.log(`========================`);
+                        
+                        if (!response.ok) {
+                            return response.text().then(text => {
+                                console.error(`=== RATING API ERROR ===`);
+                                console.error(`Item: ${item.menu_item}`);
+                                console.error(`Status: ${response.status}`);
+                                console.error(`Response text:`, text);
+                                console.error(`=======================`);
+                                throw new Error(`Rating failed for ${item.menu_item}: ${text}`);
+                            });
+                        }
+                        return response.json().then(data => {
+                            console.log(`Rating success for ${item.menu_item}:`, data);
+                            return data;
+                        });
+                    });
+                });
+
+                const responses = await Promise.all(ratingPromises);
+                console.log('All rating responses:', responses);
+                
+                alert('Thank you for your rating!');
+                closeRatingModal();
+                location.reload();
+                
+            } catch (error) {
+                console.error('=== RATING SUBMISSION ERROR ===');
+                console.error('Error details:', error);
+                console.error('Error message:', error.message);
+                console.error('Error stack:', error.stack);
+                console.error('==============================');
+                
+                // Show more detailed error message
+                let errorMessage = 'Could not submit rating. Please try again.';
+                if (error.message) {
+                    errorMessage += `\n\nError: ${error.message}`;
+                }
+                alert(errorMessage);
+            }
+        }
+    </script>
+</body>
+
+</html>

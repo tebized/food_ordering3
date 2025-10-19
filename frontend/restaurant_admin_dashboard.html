@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --background-color: #f4f6f9;
+            --surface-color: #ffffff;
+            --text-color: #34495e;
+            --accent-color: #e74c3c;
+            --success-color: #2ecc71;
+            --border-radius: 8px;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--background-color);
+            margin: 0;
+            color: var(--text-color);
+        }
+
+        .container {
+            padding: 15px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            #restaurant-name {
+                font-size: 1.4em;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .order-card {
+                margin-bottom: 15px;
+            }
+            
+            .order-card-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+            
+            .order-details {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .action-button {
+                width: 100%;
+                margin-top: 10px;
+            }
+            
+            .summary-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 8px;
+            }
+            
+            #restaurant-name {
+                font-size: 1.2em;
+            }
+            
+            .stats-grid {
+                gap: 8px;
+            }
+            
+            .stat-card {
+                padding: 15px;
+            }
+            
+            .stat-number {
+                font-size: 1.8em;
+            }
+            
+            .order-card {
+                padding: 15px;
+            }
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        #restaurant-name {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        #logout-btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.3s;
+        }
+
+        #logout-btn:hover {
+            background-color: #c0392b;
+        }
+
+        .tabs {
+            display: flex;
+            background-color: var(--surface-color);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            padding: 5px;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 15px 10px;
+            background-color: transparent;
+            border: none;
+            font-size: 1em;
+            font-weight: 600;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 6px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-button.active {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .order-count {
+            background-color: rgba(0, 0, 0, 0.1);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .order-card {
+            background-color: var(--surface-color);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: var(--shadow);
+        }
+
+        .order-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .order-id {
+            font-size: 1.1em;
+        }
+
+        .customer-name {
+            color: #7f8c8d;
+        }
+
+        .order-items ul {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 15px 0;
+            border-top: 1px solid var(--background-color);
+            padding-top: 10px;
+        }
+
+        .order-items li {
+            padding: 5px 0;
+        }
+
+        .order-total {
+            text-align: right;
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+        }
+
+        .order-details {
+            margin-top: 10px;
+        }
+
+        .customer-info {
+            margin-bottom: 10px;
+            padding: 8px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        .order-date {
+            font-size: 0.8em;
+            color: #666;
+        }
+
+        .summary-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .summary-card .order-id {
+            color: #2c3e50;
+        }
+
+        .summary-card .order-total {
+            margin-bottom: 0;
+            color: var(--success-color);
+        }
+
+        .summary-total {
+            padding: 20px;
+            margin-top: 10px;
+            background-color: var(--surface-color);
+            border-radius: var(--border-radius);
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .summary-total h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.2em;
+        }
+
+        .summary-total p {
+            margin: 0;
+            font-size: 2em;
+            font-weight: bold;
+            color: var(--success-color);
+        }
+
+
+        .action-button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .action-button:hover {
+            background-color: #27ae60;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <header class="header">
+            <h1 id="restaurant-name">Loading...</h1>
+            <button id="logout-btn">Logout</button>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab-button active" data-tab="confirmed">
+                Preparing <span class="order-count" id="confirmed-count">0</span>
+            </button>
+            <button class="tab-button" data-tab="ready">
+                Ready for Pickup <span class="order-count" id="ready-count">0</span>
+            </button>
+            <button class="tab-button" data-tab="summary">
+                Summary <span class="order-count" id="summary-count">0</span>
+            </button>
+        </nav>
+
+        <main>
+            <section class="tab-content active" id="confirmed-content">
+                <!-- Confirmed orders will be dynamically inserted here -->
+            </section>
+            <section class="tab-content" id="ready-content">
+                <!-- Ready orders will be dynamically inserted here -->
+            </section>
+            <section class="tab-content" id="summary-content">
+                <div class="summary-total">
+                    <h3>Today's Revenue</h3>
+                    <p id="todays-revenue">0.00 ETB</p>
+                </div>
+                <div id="summary-orders-list" style="margin-top: 20px;">
+                    <!-- Delivered orders will be dynamically inserted here -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://127.0.0.1:8000';
+        const accessToken = localStorage.getItem('accessToken');
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!accessToken) {
+                window.location.href = 'restaurant_admin_login.html';
+                return;
+            }
+
+            // Verify user role before allowing access
+            verifyUserRoleAndSetup();
+        });
+
+        async function verifyUserRoleAndSetup() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/profile/`, {
+                    headers: { 'Authorization': `Bearer ${accessToken}` }
+                });
+
+                if (!response.ok) {
+                    localStorage.removeItem('accessToken');
+                    window.location.href = 'restaurant_admin_login.html';
+                    return;
+                }
+
+                const userProfile = await response.json();
+                
+                // Role-based access control: Only restaurant_admin can access this dashboard
+                if (userProfile.role !== 'restaurant_admin') {
+                    localStorage.removeItem('accessToken');
+                    alert('Access Denied: You do not have permission to access this page.');
+                    window.location.href = 'restaurant_admin_login.html';
+                    return;
+                }
+
+                // If role is correct, proceed with setup
+                setupTabs();
+                fetchUserProfile();
+                fetchAllOrders();
+
+                document.getElementById('logout-btn').addEventListener('click', () => {
+                    localStorage.removeItem('accessToken');
+                    window.location.href = 'restaurant_admin_login.html';
+                });
+            } catch (error) {
+                console.error('Role verification failed:', error);
+                localStorage.removeItem('accessToken');
+                window.location.href = 'restaurant_admin_login.html';
+            }
+        }
+
+        function setupTabs() {
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetTab = button.dataset.tab;
+
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                        if (content.id === `${targetTab}-content`) {
+                            content.classList.add('active');
+                        }
+                    });
+                });
+            });
+        }
+
+        async function fetchUserProfile() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/profile/`, {
+                    headers: { 'Authorization': `Bearer ${accessToken}` }
+                });
+                if (!response.ok) throw new Error('Failed to fetch profile');
+
+                const profile = await response.json();
+                document.getElementById('restaurant-name').textContent = profile.restaurant ? profile.restaurant.name : 'Admin Dashboard';
+            } catch (error) {
+                console.error('Error fetching profile:', error);
+                document.getElementById('restaurant-name').textContent = 'Error Loading Name';
+            }
+        }
+
+        async function fetchAllOrders() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/orders/`, {
+                    headers: { 'Authorization': `Bearer ${accessToken}` }
+                });
+                if (!response.ok) throw new Error('Failed to fetch orders');
+
+                const orders = await response.json();
+                renderOrders(orders);
+            } catch (error) {
+                console.error('Error fetching orders:', error);
+            }
+        }
+
+        function renderOrders(orders) {
+            const confirmedList = document.getElementById('confirmed-content');
+            const readyList = document.getElementById('ready-content');
+            const summaryList = document.getElementById('summary-orders-list');
+
+            confirmedList.innerHTML = '';
+            readyList.innerHTML = '';
+            summaryList.innerHTML = '';
+
+            // Restaurant admins now only see orders after sub-admin approval
+            // So they won't see 'Pending Approval' orders anymore
+            const confirmedOrders = orders.filter(o => o.status === 'Preparing');
+            const readyOrders = orders.filter(o => o.status === 'Ready for Pickup');
+            const deliveredOrders = orders.filter(o => o.status === 'Delivered');
+            const completedOrders = orders.filter(o => o.status === 'Completed');
+
+            document.getElementById('confirmed-count').textContent = confirmedOrders.length;
+            document.getElementById('ready-count').textContent = readyOrders.length;
+            document.getElementById('summary-count').textContent = deliveredOrders.length + completedOrders.length;
+
+            confirmedOrders.forEach(order => confirmedList.innerHTML += createOrderCard(order));
+            readyOrders.forEach(order => readyList.innerHTML += createOrderCard(order));
+            deliveredOrders.forEach(order => summaryList.innerHTML += createSummaryCard(order));
+            completedOrders.forEach(order => summaryList.innerHTML += createSummaryCard(order));
+
+            calculateTodaysRevenue(deliveredOrders.concat(completedOrders));
+        }
+
+        function calculateTodaysRevenue(completedOrders) {
+            const today = new Date().toISOString().split('T')[0];
+            let todaysTotal = 0;
+
+            completedOrders.forEach(order => {
+                const orderDate = new Date(order.created_at).toISOString().split('T')[0];
+                if (orderDate === today) {
+                    todaysTotal += parseFloat(order.total_price);
+                }
+            });
+
+            document.getElementById('todays-revenue').textContent = `${todaysTotal.toFixed(2)} ETB`;
+        }
+
+        function createOrderCard(order) {
+            const isConfirmed = order.status === 'Pending Approval';
+            const itemsHtml = order.order_items ? order.order_items.map(item => {
+                // Debug: log the item to see what's available
+                console.log('Order item:', item);
+                
+                // Try different ways to get the item name
+                const itemName = item.menu_item_name || 
+                                (item.menu_item_details ? item.menu_item_details.name : null) ||
+                                (item.menu_item ? item.menu_item.name : null) ||
+                                (item.addon_name || (item.addon_details ? item.addon_details.name : null)) ||
+                                'Unknown Item';
+                
+                const itemPrice = item.menu_item_price || 
+                                 (item.menu_item_details ? item.menu_item_details.price : null) ||
+                                 (item.menu_item ? item.menu_item.price : null) ||
+                                 (item.addon_price || (item.addon_details ? item.addon_details.price : null)) ||
+                                 0;
+                
+                const totalPrice = itemPrice * item.quantity;
+                return `<li>${item.quantity}x ${itemName} - ${totalPrice.toFixed(2)} ETB</li>`;
+            }).join('') : '<li>No items found</li>';
+
+            // Show "Mark as Ready for Pickup" button for Preparing orders
+            const actionButtonHtml = order.status === 'Preparing' ?
+                `<button class="action-button" onclick="markAsReadyForPickup(${order.id})">Mark as Ready for Pickup</button>` : '';
+
+            const customerPhone = order.customer_details ? (order.customer_details.phone_number || 'N/A') : 'N/A';
+            const deliveryAddress = 'N/A';
+            const orderDate = new Date(order.created_at).toLocaleString();
+
+            return `
+                <div class="order-card" id="order-${order.id}">
+                    <div class="order-card-header">
+                        <span class="order-id">Order #${order.order_code}</span>
+                        <span class="order-date">${orderDate}</span>
+                    </div>
+                    <div class="order-details">
+                        <div class="customer-info">
+                            <strong>Customer:</strong> ${order.customer_details ? order.customer_details.username : 'Unknown'}<br>
+                            <strong>Phone:</strong> ${customerPhone}<br>
+                            <strong>Delivery Address:</strong> ${deliveryAddress}
+                        </div>
+                        <div class="order-items">
+                            <strong>Items:</strong>
+                            <ul>${itemsHtml}</ul>
+                        </div>
+                        <div class="order-total">
+                            <strong>Total: ${parseFloat(order.total_price).toFixed(2)} ETB</strong>
+                        </div>
+                    </div>
+                    ${actionButtonHtml}
+                </div>`;
+        }
+
+        function createSummaryCard(order) {
+            return `
+                <div class="order-card summary-card" id="summary-order-${order.id}">
+                    <span class="order-id">${order.order_code} - ${order.customer_details.username}</span>
+                    <span class="order-total">${parseFloat(order.total_price).toFixed(2)} ETB</span>
+                </div>`;
+        }
+
+        async function markAsReadyForPickup(orderId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/orders/${orderId}/mark_as_ready_for_pickup_restaurant/`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) throw new Error('Failed to update order status');
+                alert('Order marked as ready for pickup!');
+                fetchAllOrders();
+            } catch (error) {
+                console.error(`Error updating order ${orderId}:`, error);
+                alert('Could not update the order. Please try again.');
+            }
+        }
+    </script>
+
+</body>
+
+</html>
