@@ -11,7 +11,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-dummy-key-for-now'
 DEBUG = False
-ALLOWED_HOSTS = ['e-service.press', 'www.e-service.press', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['e-service.press', 'www.e-service.press', '127.0.0.1', 'localhost','127.0.0.1', '.vercel.app']
 
 # --- Application Definition ---
 INSTALLED_APPS = [
@@ -34,6 +34,9 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     # CORS Middleware should be placed as high as possible
     'corsheaders.middleware.CorsMiddleware',
@@ -123,3 +126,14 @@ SIMPLE_JWT = {
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+# Add these lines at the very end of the file
+
+STATIC_URL = '/static/'
+
+# This is the directory where Django will collect all static files
+STATIC_ROOT = BASE_DIR / 'staticfiles_build'
+
+# This tells Django where to find your static files in the first place
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
