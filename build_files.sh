@@ -1,5 +1,6 @@
 #!/bin/bash
 
-# Build the project
-python3.9 -m pip install -r requirements.txt
-python3.9 manage.py collectstatic --noinput
+# Exit immediately if a command exits with a non-zero status.
+set -e
+
+python manage.py collectstatic --noinput --clear
